@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Exam Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+}
+
+/* ========================= */
+/* TIMER AREA */
+/* ========================= */
+
+#timer-container{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#f4f6f9;
+    padding-bottom:10px;
+}
+
+#timer{
+    background:#222;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.timer-buttons{
+    text-align:center;
+}
+
+#pauseBtn,
+#resumeBtn{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    margin:5px;
+}
+
+#pauseBtn{
+    background:#ff9800;
+    color:white;
+}
+
+#resumeBtn{
+    background:#28a745;
+    color:white;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#f0f0f0;
+}
+
+.selected{
+    background:#cfe2ff;
+    border:2px solid #0d6efd;
+}
+
+.mark-btn{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:white;
+}
+
+.marked{
+    background:#ffcc80 !important;
+}
+
+.review-marked{
+    background:#e0e0e0 !important;
+    border:2px solid #9e9e9e;
+}
+
+.clear-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#dc3545;
+    color:white;
+}
+
+.submit-btn{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.review-btn{
+    padding:12px 20px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.review-question{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.unanswered{
+    color:orange;
+    font-weight:bold;
+}
+
+.correct-answer{
+    background:#d4edda;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.disabled-option{
+    pointer-events:none;
+    opacity:0.6;
+}
+
+.disabled-btn{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bank Exam MCQ Quiz</h1>
+
+<!-- ========================= -->
+<!-- TIMER -->
+<!-- ========================= -->
+
+<div id="timer-container">
+
+    <div id="timer">
+        Time Left: 20:00
+    </div>
+
+    <div class="timer-buttons">
+
+        <button id="pauseBtn" onclick="pauseTimer()">
+            Pause
+        </button>
+
+        <button id="resumeBtn" onclick="resumeTimer()" disabled>
+            Resume
+        </button>
+
+    </div>
+
+</div>
+
+<div id="quiz"></div>
+
+<button class="submit-btn" onclick="submitQuiz()">
+Submit Quiz
+</button>
+
+</div>
+
+<script>
+
+// ===============================
+// QUESTIONS AREA
+// ===============================
+
+const questions = [
+ {q:"The Asian Development Bank (ADB) approved a USD 1 billion loan to support the Government of India’s urban reform agenda. Through which mechanism will the loan support urban transformation?", options:["Urban Challenge Fund (UCF)","Urban Infrastructure Fund (UIF)","National Urban Renewal Fund (NURF)","Urban Development Finance Scheme (UDFS)"], answer:0},
+  {q:"Along with the USD 1 billion loan, the Asian Development Bank (ADB) approved how much technical assistance to support the Ministry of Housing and Urban Affairs (MoHUA) in implementing the urban reform programme?", options:["USD 2 million","USD 3 million","USD 4 million","USD 5 million"], answer:1},
+  {q:"Which of the following correctly describes the Asian Development Bank (ADB), which approved the USD 1 billion loan for India’s urban transformation agenda?", options:["Established in 1965, headquartered in Singapore, with 68 members","Established in 1966, headquartered in Manila, Philippines, with 69 members","Established in 1966, headquartered in Bangkok, Thailand, with 69 members","Established in 1967, headquartered in Manila, Philippines, with 68 members"], answer:1},
+  {q:"The India-Maldives Favara-UPI cross-border payment corridor enables real-time transfers between the two countries. Which organisations were central to this initiative along with other stakeholders?", options:["Maldives Monetary Authority (MMA) and National Payments Corporation of India (NPCI)","Maldives Monetary Authority (MMA) and Unified Payments Interface (UPI)","Reserve Bank of India (RBI) and Maldives Development Bank","NPCI International Payments Limited (NIPL) and Maldives Development Bank"], answer:1},
+  {q:"Under the India-Maldives Favara-UPI cross-border payment corridor, how is a transaction processed when a payment is initiated in the Maldives?", options:["Initiated in INR and credited in Maldivian Rufiyaa (MVR) to a UPI-enabled account","Initiated in USD and credited in INR through correspondent banking accounts","Initiated in Maldivian Rufiyaa (MVR) and credited directly in Indian Rupees (INR) to UPI-enabled bank accounts","Initiated in MVR and credited in USD before conversion into INR by commercial banks"], answer:2},
+  {q:"The Unified Payments Interface (UPI) has expanded its global presence beyond India. Which of the following countries is included among the countries where UPI is accepted?", options:["Germany","Japan","Australia","Qatar"], answer:3},
+  {q:"Varsha Ashok Aglawe was appointed as the 54th Director General (DG) of the Geological Survey of India (GSI). What is the major significance of her appointment?", options:["She became the first woman Director General of GSI in its 176-year history","She became the youngest Director General of GSI since its establishment","She became the first non-geologist to head GSI in its history","She became the first woman Chairperson of GSI after its restructuring"], answer:0},
+  {q:"Varsha Ashok Aglawe assumed charge as the 54th Director General of the Geological Survey of India (GSI), succeeding whom?", options:["K. Rajaraman","Asit Saha","A S Rajeev","Tarun Sobti"], answer:1},
+  {q:"The Securities and Exchange Board of India (SEBI) extended the deadline for regulated entities to complete accessibility audits of digital platforms and remediation of findings. What is the revised deadline?", options:["30 September 2026","15 October 2026","31 October 2026","30 November 2026"], answer:2},
+  {q:"Along with extending the Digital Accessibility Audit deadline, the Securities and Exchange Board of India (SEBI) introduced which framework to simplify and speed up the launch of Alternative Investment Fund (AIF) schemes through a streamlined filing process?", options:["GARUDA framework","GARUDA-Plus framework","SAMPARK framework","AIF FastTrack framework"], answer:0},
+  {q:"The Government of India extended K. Rajaraman’s tenure as Chairperson of the International Financial Services Centres Authority (IFSCA). Until what date was his tenure extended, subject to the stated conditions?", options:["24 October 2027","24 October 2028","31 December 2028","31 March 2029"], answer:1},
+  {q:"K. Rajaraman was appointed as the first full-time Chairperson of the International Financial Services Centres Authority (IFSCA) in October 2023. What was the original term for which he was appointed?", options:["Two years","Three years","Four years","Five years"], answer:1},
+  {q:"The International Financial Services Centres Authority (IFSCA) was established in April 2020 under the IFSCA Act, 2019. Where is its headquarters located?", options:["Mumbai, Maharashtra","New Delhi, Delhi","GIFT City, Gandhinagar, Gujarat","Ahmedabad, Gujarat"], answer:2},
+  {q:"Vice Admiral AN Pramod assumed charge as Deputy Chief of Naval Staff (DCNS) of the Indian Navy (IN). Whom did he succeed in this position?", options:["Vice Admiral Tarun Sobti","Vice Admiral Sanjay Mahindru","Vice Admiral Krishna Swaminathan","Vice Admiral Dinesh K Tripathi"], answer:0},
+  {q:"Before assuming charge as Deputy Chief of Naval Staff (DCNS), which important position was held by Vice Admiral AN Pramod?", options:["Director General Naval Operations (DGNO)","Flag Officer Commanding-in-Chief of Western Naval Command","Chief of Personnel of the Indian Navy","Controller Personnel Services of the Indian Navy"], answer:0},
+  {q:"Vice Admiral AN Pramod served as Fleet Operations Officer of the Western Fleet and was associated with several operations. Which combination correctly identifies two of these operations mentioned in his profile?", options:["Operation Meghdoot and Operation Cactus","Operation Vijay (1999) and Operation Parakram (2001)","Operation Pawan and Operation Rhino","Operation Trident and Operation Python"], answer:1},
+  {q:"HDFC Bank launched two new savings account variants called ‘Max for Seniors’ and ‘Max for Her’. Which benefit is specifically associated with the ‘Max for Seniors’ account?", options:["50% discount on locker charges and complimentary airport lounge access","Cyber insurance cover up to ₹25,000 and an additional 0.5% interest on Fixed Deposits (FDs)","Complimentary health check-up and additional accident cover up to ₹10 lakh","Free international transactions and a ₹5 lakh travel insurance cover"], answer:1},
+  {q:"Under HDFC Bank’s ‘Max for Her’ savings account, which of the following is one of the stated benefits provided to eligible customers?", options:["Additional 0.5% interest on Fixed Deposits (FDs)","Cyber insurance cover up to ₹25,000","50% discount on locker charges and complimentary airport lounge access","Three-year waiver of all account maintenance charges"], answer:2},
+  {q:"A S Rajeev, who was serving as a Vigilance Commissioner in the Central Vigilance Commission (CVC), assumed charge as the Acting Central Vigilance Commissioner. From which date did he assume the acting charge?", options:["1 August 2026","3 August 2026","5 August 2026","10 August 2026"], answer:1},
+  {q:"A S Rajeev assumed charge as Acting Central Vigilance Commissioner (CVC), succeeding whom in the position?", options:["Praveen Kumar Srivastava","Sanjay Kumar Verma","Rajiv Kumar","Asit Saha"], answer:0},
+  {q:"The Reserve Bank of India (RBI) appointed Monisha Chakraborty as an Executive Director (ED) effective from 3 August 2026. Which two departments were placed under her oversight?", options:["Foreign Exchange Department (FED) and Financial Markets Regulation Department (FMRD)","Financial Markets Regulation Department (FMRD) and Department of Supervision (DoS)","Foreign Exchange Department (FED) and Department of Regulation (DoR)","Financial Markets Regulation Department (FMRD) and Department of Payment and Settlement Systems (DPSS)"], answer:0},
+  {q:"Before being appointed Executive Director (ED) of the Reserve Bank of India (RBI), Monisha Chakraborty served as Chief General Manager-in-Charge in which RBI department?", options:["Department of Regulation","Department of Supervision","Foreign Exchange Department","Financial Markets Regulation Department"], answer:1},
+  {q:"The Reserve Bank of India (RBI), under which legal framework began operations on 1 April 1935 and was nationalised on 1 January 1949?", options:["RBI Act, 1934","Banking Regulation Act, 1949","RBI Act, 1949","Indian Banking Companies Act, 1936"], answer:0},
+  {q:"Prasanta Mahapatra assumed charge as Executive Director (ED) of the Securities and Exchange Board of India (SEBI). Which two divisions were assigned to him?", options:["Corporation Finance Investigation Department (CFID) and Recovery and Refund Department (RRD)","Corporate Finance Department (CFD) and Investor Protection Department (IPD)","Recovery and Refund Department (RRD) and Market Regulation Department (MRD)","Corporation Finance Investigation Department (CFID) and Market Intermediaries Regulation Department (MIRD)"], answer:0},
+  {q:"Before becoming Executive Director (ED) of the Securities and Exchange Board of India (SEBI), Prasanta Mahapatra held which position in the organisation?", options:["Executive Director","Chief General Manager (CGM)","General Manager-in-Charge","Whole-Time Member"], answer:1},
+  {q:"The Securities and Exchange Board of India (SEBI) was established as a statutory regulatory body on which date under the SEBI Act, 1992, with its headquarters in Mumbai, Maharashtra?", options:["30 January 1991","30 January 1992","1 April 1992","12 September 1992"], answer:1},
+  {q:"Bajaj General Insurance Limited signed a Memorandum of Understanding (MoU) with Swiss Re Corporate Solutions. What is the primary purpose of this partnership?", options:["To expand India’s retail health insurance market through digital distribution","To explore a partnership in India’s commercial insurance segment","To establish a joint venture for motor insurance across South Asia","To provide government-backed agricultural insurance programmes"], answer:1},
+  {q:"Under the partnership between Bajaj General Insurance Limited and Swiss Re Corporate Solutions, what is the key objective for Indian businesses with overseas operations?", options:["To provide international programmes for Indian businesses with overseas operations","To offer only domestic insurance products to multinational corporations","To establish overseas branches for Indian insurance policyholders","To provide subsidised insurance for Indian exporters through public funds"], answer:0},
+  {q:"Bajaj General Insurance Limited and Swiss Re Corporate Solutions plan to leverage which platform of Swiss Re for their proposed commercial insurance partnership?", options:["Swiss Re Global Risk Platform","Swiss Re International Programs platform","Swiss Re International Claims Network","Swiss Re Global Insurance Exchange"], answer:1},
+  {q:"Bajaj General Insurance Limited, which entered into an MoU with Swiss Re Corporate Solutions, was established in 2001 and is headquartered in which city?", options:["Mumbai, Maharashtra","Pune, Maharashtra","Ahmedabad, Gujarat","Bengaluru, Karnataka"], answer:1},
+  {q:"Indian astrophysicist Annapurni Subramaniam, Director of the Indian Institute of Astrophysics (IIA), Bengaluru, received which prestigious award at the 46th COSPAR Scientific Assembly in Florence, Italy?", options:["COSPAR Vikram Sarabhai Medal 2026","Aryabhata Award 2026","ISRO Space Science Medal 2026","Vikram Sarabhai Space Achievement Award 2026"], answer:0},
+  {q:"Annapurni Subramaniam became the fourth Indian recipient and the first Indian woman scientist to receive the COSPAR Vikram Sarabhai Medal. She was also only the third woman globally to receive the award. Who among the following was a previous Indian recipient in 2024?", options:["Gurbax Singh Lakhina","Udupi Ramachandra Rao (U. R. Rao)","Anil Bharadwaj","Annapurni Subramaniam"], answer:2},
+  {q:"The COSPAR Vikram Sarabhai Medal was established in 1990 by the Committee on Space Research (COSPAR) and ISRO. The medal is awarded once every:", options:["Year","Two years","Three years","Five years"], answer:1},
+  {q:"The Appointments Committee of the Cabinet (ACC), based on the proposal of the Department of Personnel and Training (DoPT), approved foreign postings of senior bureaucrats to international organisations. Who was appointed Senior Adviser to the International Monetary Fund (IMF) for three years?", options:["Baldeo Purushartha","Rahul Jain","Satyajit Mohanty","Tewolde Gebremariam"], answer:1},
+  {q:"Under the foreign postings approved by the Appointments Committee of the Cabinet (ACC), who was appointed Senior Adviser to the Asian Development Bank (ADB) for a three-year term?", options:["Rahul Jain","Satyajit Mohanty","Baldeo Purushartha","Govind Mohan"], answer:2},
+  {q:"Who was approved as the Representative of India in the Council of the International Civil Aviation Organization (ICAO) for a three-year term under the key foreign postings approved by the Appointments Committee of the Cabinet (ACC)?", options:["Satyajit Mohanty","Baldeo Purushartha","Rahul Jain","T. V. Somanathan"], answer:0},
+  {q:"Air India appointed Tewolde Gebremariam as its new Chief Executive Officer and Managing Director (CEO & MD). Which organisation did he previously lead as Chief Executive Officer (CEO)?", options:["Emirates Group","Qatar Airways Group","Ethiopian Airlines Group","Singapore Airlines Group"], answer:2},
+  {q:"Tewolde Gebremariam succeeded whom as the Chief Executive Officer and Managing Director (CEO & MD) of Air India?", options:["Campbell Wilson","Ilker Ayci","Rajesh Gopinathan","Sanjay Gupta"], answer:0},
+  {q:"The Appointments Committee of the Cabinet (ACC), chaired by Prime Minister Narendra Modi, approved a one-year extension of Cabinet Secretary T. V. Somanathan. Until which date was his service extended?", options:["30 August 2026","30 August 2027","22 August 2027","31 August 2027"], answer:1},
+  {q:"T. V. Somanathan began serving as the 33rd Cabinet Secretary of India on 30 August 2024, succeeding whom?", options:["Pradeep Kumar Tripathi","Rajiv Gauba","Govind Mohan","Ajit Doval"], answer:1},
+{q:"The Union Territory (UT) of Ladakh notified 23 heritage sites as Protected Monuments under Section 3(1) of the Jammu and Kashmir Ancient Monuments Preservation Act, Samvat 1977. Which of the following areas were covered under this notification?",options:["Leh, Sham, Nubra, Zanskar and Kargil","Leh, Kargil, Drass, Jammu and Nubra","Sham, Kargil, Srinagar, Zanskar and Nubra","Leh, Zanskar, Srinagar, Poonch and Kargil"],answer:0},
+{q:"The Administration of the Union Territory (UT) of Ladakh notified 23 heritage sites as Protected Monuments under the Jammu and Kashmir Ancient Monuments Preservation Act, Samvat 1977. Which section of the Act was invoked for the notification?",options:["Section 2(1)","Section 3(1)","Section 4(2)","Section 5(1)"],answer:1},
+{q:"Ladakh became a separate Union Territory following the Jammu & Kashmir Reorganisation Act, 2019. On which date was the Union Territory of Ladakh formally created?",options:["15 August 2019","26 January 2020","31 October 2019","5 August 2019"],answer:2},
+{q:"Indian Institute of Technology Gandhinagar (IITGN) and Indian Artificial Intelligence Research Organisation (IAIRO) signed a Memorandum of Understanding (MoU) to promote joint research and talent development. Where was IAIRO established in 2026?",options:["GIFT City, Gujarat","Electronic City, Karnataka","HITEC City, Telangana","Infopark, Kerala"],answer:0},
+{q:"The Memorandum of Understanding (MoU) between Indian Institute of Technology Gandhinagar (IITGN) and Indian Artificial Intelligence Research Organisation (IAIRO) focuses on artificial intelligence research, education, innovation and talent development. Which statement about IITGN is correct?",options:["Established in 2005 under the Ministry of Science and Technology","Established in 2008 and recognised as an Institute of National Importance","Established in 2010 as a private technical university","Established in 2008 under the Ministry of Electronics and Information Technology"],answer:1},
+{q:"The National Skill Development Corporation (NSDC) and AVPL International entered into a strategic collaboration to establish Advanced Skill Centres (ASCs) for Drone Technology across India. How many such centres are proposed to be established?",options:["250","300","350","400"],answer:2},
+{q:"The National Skill Development Corporation (NSDC) and AVPL International plan to establish Advanced Skill Centres (ASCs) for Drone Technology across India. Within what period is the initiative expected to be completed?",options:["Two years","Three years","Four years","Five years"],answer:1},
+{q:"The National Skill Development Corporation (NSDC) is collaborating with AVPL International to establish Advanced Skill Centres for Drone Technology. The initiative is aligned with the National Education Policy (NEP) 2020 and supports which combination of national initiatives?",options:["Skill India, Digital India, Atmanirbhar Bharat and Viksit Bharat 2047","Startup India, Make in India, Smart Cities Mission and Sagarmala","Digital India, PM Gati Shakti, Swachh Bharat and Ayushman Bharat","Skill India, National Health Mission, Make in India and Smart Cities Mission"],answer:0},
+{q:"The Union Cabinet, chaired by Prime Minister Narendra Modi, approved the expanded Khelo India Scheme along with enhanced Assistance to National Sports Federations (ANSFs). What is the total financial outlay approved for FY 2026–27 to FY 2030–31?",options:["Rs. 28,441 crore","Rs. 32,441 crore","Rs. 36,441 crore","Rs. 40,441 crore"],answer:2},
+{q:"Under the expanded Khelo India Scheme approved by the Union Cabinet for FY 2026–27 to FY 2030–31, which initiatives are intended to support early talent identification and strengthen school-level sports?",options:["Khelo India Feeder Schools (KIFS) and Khelo India Utkrishta Vidyalayas (KIUV)","Khelo India Youth Academies (KIYA) and National Sports Schools (NSS)","Khelo India Talent Hubs (KITH) and Sports India Schools (SIS)","Khelo India Athlete Centres (KIAC) and National Sports Colleges (NSC)"],answer:0},
+{q:"The Union Cabinet approved the National Offshore Exploration (NOE) scheme, known as ‘Samudra Manthan’, to boost offshore oil and gas exploration and strengthen India's energy security. What is the approved outlay?",options:["Rs. 64,084 crore","Rs. 74,084 crore","Rs. 84,084 crore","Rs. 94,084 crore"],answer:2},
+{q:"‘Samudra Manthan’, formally the National Offshore Exploration (NOE) scheme, is a Central Sector Scheme with 100% funding by the central government. Under which ministry is it implemented?",options:["Ministry of Coal","Ministry of Petroleum and Natural Gas","Ministry of New and Renewable Energy","Ministry of Heavy Industries"],answer:1},
+{q:"The National Offshore Exploration (NOE) scheme, ‘Samudra Manthan’, aims to increase India's annual domestic oil and gas production. From the existing level of 62 MMTOE, what production level is targeted?",options:["70 MMTOE","75 MMTOE","80 MMTOE","85 MMTOE"],answer:2},
+{q:"The Union Cabinet approved the Pradhan Mantri Surya Sarovar Yojana (PM-SSY) for the development of Floating Solar Photovoltaic (FSPV) projects. What is the approved financial outlay and targeted floating solar capacity?",options:["Rs. 4,070 crore and 4,000 MW","Rs. 5,070 crore and 5,000 MW","Rs. 6,070 crore and 6,000 MW","Rs. 5,500 crore and 5,500 MW"],answer:1},
+{q:"Under the Pradhan Mantri Surya Sarovar Yojana (PM-SSY), approved for Floating Solar Photovoltaic (FSPV) projects during FY 2026–27 to FY 2030–31, what Central Financial Assistance (CFA) is provided after project commissioning?",options:["Rs. 50 lakh per MW","Rs. 75 lakh per MW","Rs. 1 crore per MW","Rs. 2 crore per MW"],answer:2},
+{q:"The Union Cabinet approved continuation of the Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) scheme for another five years from 2026–27 to 2030–31. What is the approved total outlay?",options:["Rs. 2.15 lakh crore","Rs. 2.75 lakh crore","Rs. 3.15 lakh crore","Rs. 3.75 lakh crore"],answer:2},
+{q:"Under the Pradhan Mantri Kisan Samman Nidhi (PM-KISAN), eligible farmer families receive annual financial assistance through Direct Benefit Transfer (DBT). How is the Rs. 6,000 annual assistance distributed?",options:["Three equal instalments of Rs. 2,000 each","Two equal instalments of Rs. 3,000 each","Four equal instalments of Rs. 1,500 each","Six equal instalments of Rs. 1,000 each"],answer:0},
+{q:"The Department of Financial Services (DFS), Ministry of Finance, launched India's first sovereign-backed Protection & Indemnity (P&I) insurance product under the Bharat Maritime Insurance Pool (BMIP). What level of third-party liability coverage does it provide?",options:["Up to USD 500 million","Up to USD 1 billion","Up to USD 1.5 billion","Up to USD 2 billion"],answer:2},
+{q:"The first sovereign-backed Protection & Indemnity (P&I) insurance policy under the Bharat Maritime Insurance Pool (BMIP) was designed and issued by New India Assurance Company Limited (NIACL). To which organisation was the first policy issued?",options:["Shipping Corporation of India Limited (SCI)","Cochin Shipyard Limited (CSL)","Indian Ports Association (IPA)","India Ports Global Limited (IPGL)"],answer:0},
+{q:"The Department of Financial Services (DFS) launched India's first sovereign-backed Protection & Indemnity (P&I) insurance product under the Bharat Maritime Insurance Pool (BMIP). Who handed over the first P&I insurance policy document?",options:["Secretary, Ministry of Petroleum and Natural Gas","Secretary, Department of Financial Services, Sanjay Lohia","Chairman, New India Assurance Company Limited","Chairman, Shipping Corporation of India Limited"],answer:1},
+{q:"The Ministry of AYUSH and IndiaAI signed a Memorandum of Understanding (MoU) to promote Artificial Intelligence (AI)-driven innovation in the traditional medicine sector. What is the initial tenure of this MoU?",options:["One year, renewable annually","Two years, renewable through mutual agreement","Three years, renewable automatically","Five years, renewable after government approval"],answer:1},
+{q:"The Ministry of AYUSH and IndiaAI signed an MoU to promote Artificial Intelligence (AI)-driven innovation in the AYUSH sector. Which of the following correctly expands AYUSH?",options:["Ayurveda, Yoga & Naturopathy, Unani, Siddha and Homoeopathy","Ayurveda, Yoga & Nutrition, Unani, Siddha and Homoeopathy","Ayurveda, Yoga & Naturopathy, Unani, Science and Homoeopathy","Ayurveda, Yoga & Naturopathy, Universal Medicine, Siddha and Homoeopathy"],answer:0},
+{q:"The Memorandum of Understanding (MoU) between the Ministry of AYUSH and IndiaAI was signed by Dr. Kavita Jain, Joint Secretary & Chief Vigilance Officer, Ministry of AYUSH, and Sudeep Srivastava. What position does Sudeep Srivastava hold?",options:["Chief Executive Officer of IndiaAI and Secretary, Ministry of AYUSH","Chief Operating Officer of IndiaAI Mission and Joint Secretary, MeitY","Chief Technology Officer of IndiaAI and Additional Secretary, MoE","Managing Director of IndiaAI Mission and Joint Secretary, Ministry of Science and Technology"],answer:1},
+{q:"The Cotton Corporation of India Limited (CCI) observed its 56th Foundation Day at Chhatrapati Sambhajinagar, Maharashtra, under the leadership of Union Minister Giriraj Singh. Which bulletin was launched on the occasion?",options:["Kapas Vikas Bulletin","Kapas Darshan Bulletin","Cotton India Bulletin","Kapas Pragati Bulletin"],answer:1},
+{q:"At the 56th Foundation Day of the Cotton Corporation of India Limited (CCI), the ‘Kapas Darshan’ Bulletin was launched and modern farm equipment was distributed. The event also implemented the roadmap of which mission?",options:["Rs. 4,659-crore National Cotton Development Mission","Rs. 5,659-crore Cotton Productivity Mission","Rs. 6,559-crore Cotton Modernisation Mission","Rs. 5,956-crore National Textile Productivity Mission"],answer:1},
+{q:"REC Limited and Power Finance Corporation (PFC) Limited signed a Common Loan Agreement with Meja Urja Nigam Private Limited (MUNPL) to finance a thermal power expansion project in Uttar Pradesh. What was the value of the agreement?",options:["Rs. 24,850 crore","Rs. 25,680 crore","Rs. 26,850 crore","Rs. 28,650 crore"],answer:2},
+{q:"The Common Loan Agreement signed by REC Limited, Power Finance Corporation (PFC) Limited and Meja Urja Nigam Private Limited (MUNPL) will finance the expansion of the Meja Thermal Power Project in Uttar Pradesh. What is the capacity of the expansion?",options:["1,800 MW","2,000 MW","2,400 MW","3,000 MW"],answer:2},
+{q:"For the Rs. 26,850-crore loan agreement related to the Meja Thermal Power Project expansion, REC Limited and Power Finance Corporation (PFC) Limited will share the funding equally. What is the project cost mentioned for the expansion?",options:["Rs. 36,357.81 crore","Rs. 37,385.71 crore","Rs. 38,357.81 crore","Rs. 39,857.81 crore"],answer:2},
+{q:"The Pradhan Mantri Viksit Bharat Rojgar Yojana (PM-VBRY) completed one year of implementation and helped formalise more than 72 lakh first-time employees. Which ministry is responsible for implementing the scheme?",options:["Ministry of Finance","Ministry of Skill Development and Entrepreneurship","Ministry of Labour & Employment","Ministry of Corporate Affairs"],answer:2},
+{q:"The Pradhan Mantri Viksit Bharat Rojgar Yojana (PM-VBRY) is being implemented through the Employees’ Provident Fund Organisation (EPFO). What is the implementation period and total outlay of the scheme?",options:["1 August 2025 to 31 July 2027 with Rs. 99,446 crore outlay","1 July 2025 to 30 June 2027 with Rs. 89,446 crore outlay","1 August 2026 to 31 July 2028 with Rs. 99,446 crore outlay","1 April 2025 to 31 March 2027 with Rs. 1,00,446 crore outlay"],answer:0},
+{q:"The Pradhan Mantri Viksit Bharat Rojgar Yojana (PM-VBRY) has two components addressing both employees and employers. Which statement correctly describes these two parts?",options:["Employee assistance for first-time formal workers and employer incentives for additional employment","Employee loans for skill development and employer subsidies for exports","Employee pension benefits and employer tax rebates for existing workers","Employee insurance assistance and employer credit guarantees for startups"],answer:0},
+{q:"Bharat Electronics Limited (BEL) and Esri India signed a Memorandum of Understanding (MoU) to develop advanced Geographic Information System (GIS), Location Intelligence and Geospatial Artificial Intelligence (GeoAI) solutions. Which sector is the primary focus?",options:["Agriculture and rural development","India's defence sector","Healthcare and pharmaceuticals","Tourism and cultural heritage"],answer:1},
+{q:"The Memorandum of Understanding (MoU) between Bharat Electronics Limited (BEL) and Esri India was signed by Rajnish Sharma and Agendra Kumar. What are their respective positions?",options:["Director of BEL and Managing Director of Esri India","Chairman of BEL and Chief Executive Officer of Esri India","Managing Director of BEL and Director of Esri India","Chief Technology Officer of BEL and President of Esri India"],answer:0},
+{q:"Bharat Electronics Limited (BEL), which signed an MoU with Esri India for defence-focused Geographic Information System (GIS) and GeoAI solutions, is a Navratna Central Public Sector Enterprise (CPSE). Which combination correctly describes BEL?",options:["Established in 1954; headquartered in Bengaluru, Karnataka","Established in 1964; headquartered in Hyderabad, Telangana","Established in 1956; headquartered in New Delhi, Delhi","Established in 1948; headquartered in Mumbai, Maharashtra"],answer:0},
+{q:"The Associated Chambers of Commerce and Industry of India (ASSOCHAM) signed two Memoranda of Understanding (MoUs) with Business France and the India & Arab Countries Chamber of Commerce, Industry and Agriculture (IACCIA). What is the broad objective of these agreements?",options:["To strengthen trade, investment, technology collaboration and business opportunities","To establish a common currency and unified taxation system","To create a joint defence procurement and manufacturing framework","To coordinate only tourism and cultural exchange programmes"],answer:0},
+{q:"The Associated Chambers of Commerce and Industry of India (ASSOCHAM) signed an MoU with Business France. What is the principal focus of this particular collaboration?",options:["India–France trade and investment along with technology collaboration","India–France defence exercises and border management","India–France agricultural subsidies and food security","India–France educational admissions and student exchange only"],answer:0},
+{q:"The Associated Chambers of Commerce and Industry of India (ASSOCHAM) signed an MoU with the India & Arab Countries Chamber of Commerce, Industry and Agriculture (IACCIA). What is the main objective of IACCIA in this collaboration?",options:["Strengthening India-Arab economic ties through trade facilitation","Developing India's domestic banking network through Arab investment","Coordinating India-Arab military exercises and maritime security","Promoting only Indian cultural festivals across Arab countries"],answer:0},
+{q:"The book ‘Bringing the Cheetah Back to India: How Diplomacy Made Conservation’s Big Mission Possible’ was written by Prashant Agrawal, an Indian Foreign Service (IFS) officer. Which statement correctly describes the book?",options:["It chronicles the diplomatic and conservation efforts behind translocating African cheetahs to Kuno National Park","It documents India's first successful breeding programme for Asiatic lions in Gir","It examines India's diplomatic role in protecting snow leopards in Ladakh","It describes the relocation of Indian elephants from Assam to Madhya Pradesh"],answer:0},
+{q:"Prashant Agrawal, the author of ‘Bringing the Cheetah Back to India: How Diplomacy Made Conservation’s Big Mission Possible’, belongs to which Indian Foreign Service (IFS) batch and cadre?",options:["1996 batch, Rajasthan cadre","1998 batch, Madhya Pradesh cadre","2000 batch, Maharashtra cadre","1998 batch, Gujarat cadre"],answer:1},
+{q:"The book ‘Bringing the Cheetah Back to India: How Diplomacy Made Conservation’s Big Mission Possible’ discusses the translocation of African cheetahs to Kuno National Park. From which two countries were the cheetahs brought to India?",options:["Kenya and Tanzania","Namibia and South Africa","Botswana and Zimbabwe","South Africa and Kenya"],answer:1},
+
+{q:"The Indian Navy (IN) received 'Nipun', the second Indigenous Diving Support Vessel (DSV), built by Hindustan Shipyard Limited (HSL). At which location was the vessel received, and what is its primary operational purpose?",options:["Kochi, Kerala; to strengthen coastal surveillance, anti-submarine warfare and maritime patrol operations","Mumbai, Maharashtra; to support aircraft carrier operations and offshore oil exploration","Visakhapatnam, Andhra Pradesh; to strengthen deep-sea diving, submarine rescue and underwater salvage capabilities","Chennai, Tamil Nadu; to improve mine countermeasures, naval aviation and amphibious operations"],answer:2},
+{q:"The Indigenous Diving Support Vessel (DSV) 'Nipun' has a name derived from Sanskrit and contains a significant proportion of indigenous components. Which option correctly describes the meaning of its name and its indigenous content?",options:["'Nipun' means powerful and invincible, and the vessel has approximately 60% indigenous content","'Nipun' means adept, capable and well-versed in a particular discipline, and the vessel has nearly 75% indigenous content","'Nipun' means protector of the oceans, and the vessel has nearly 80% indigenous content","'Nipun' means skilled navigator, and the vessel has approximately 65% indigenous content"],answer:1},
+{q:"Hindustan Shipyard Limited (HSL), which built the Indigenous Diving Support Vessel (DSV) 'Nipun', is a Defence Public Sector Undertaking (DPSU). Which combination correctly identifies HSL's establishment year, headquarters and administrative ministry?",options:["Established in 1941; headquarters at Visakhapatnam, Andhra Pradesh; under the Ministry of Defence","Established in 1950; headquarters at New Delhi; under the Ministry of Ports, Shipping and Waterways","Established in 1947; headquarters at Mumbai, Maharashtra; under the Ministry of Heavy Industries","Established in 1962; headquarters at Kochi, Kerala; under the Ministry of Defence"],answer:0},
+{q:"The Indian Navy (IN) launched 'DSC A24', the fifth and final ship under its Diving Support Craft (DSC) project. Which company constructed the vessel, and where was it launched?",options:["Hindustan Shipyard Limited (HSL), at Visakhapatnam, Andhra Pradesh","Garden Reach Shipbuilders and Engineers (GRSE), at Kolkata, West Bengal","Cochin Shipyard Limited (CSL), at Kochi, Kerala","Titagarh Rail Systems Limited (TRSL), at Titagarh, Kolkata, West Bengal"],answer:3},
+{q:"The launch ceremony of the Indian Navy's fifth and final Diving Support Craft (DSC), 'DSC A24', was attended by senior naval officials. Who launched the vessel in the presence of Vice Admiral Gurcharan Singh, Chief of Personnel of the Indian Navy?",options:["Admiral Dinesh K. Tripathi","Kamal Singh","Gurdeep Singh","Pradeep Singh"],answer:1},
+{q:"Glaw Lake, located in Tawang district of Arunachal Pradesh, was recognised as India's 101st Ramsar Site. Which statement correctly describes the lake's geographical setting and the significance of the designation for the state?",options:["Located in the Western Ghats within a national park in Assam, it became Arunachal Pradesh's second Ramsar Site","Located in the Eastern Himalayas within Namdapha National Park, it became India's 100th Ramsar Site","Located in the Eastern Himalayas within Kamlang Tiger Reserve and Wildlife Sanctuary, it became Arunachal Pradesh's first Ramsar Site","Located in the Trans-Himalayan region within a wildlife sanctuary in Sikkim, it became Arunachal Pradesh's first Ramsar Site"],answer:2},
+{q:"Prime Minister Narendra Modi virtually launched the 100-week-long 'Nasha Mukt Yuva for Viksit Bharat Sankalp Abhiyan'. What is the principal objective of this nationwide campaign?",options:["To mobilise young people against substance abuse and promote the vision of a drug-free youth for a developed India","To provide financial assistance to young entrepreneurs establishing manufacturing enterprises in rural areas","To encourage young people to participate in environmental conservation and eliminate single-use plastics","To improve digital literacy among students and expand access to online educational resources"],answer:0},
+{q:"The Government of India (GoI) has been implementing the Nasha Mukt Bharat Abhiyan (NMBA) to address substance abuse. Which option correctly identifies its launch period and its relationship with the Nasha Mukt Yuva for Viksit Bharat Sankalp Abhiyan?",options:["NMBA was launched in January 2021 as a replacement for the 100-week youth campaign","NMBA was launched in September 2019 as a national programme for rural employment","NMBA was launched in August 2021 to promote digital literacy among young people","NMBA was launched in August 2020 as a GoI-led initiative addressing substance abuse, alongside the broader objective of mobilising youth against drugs"],answer:3},
+{q:"The Indian Air Force (IAF) conducted the third edition of Exercise ROTOR CLAP-III to strengthen its ability to respond to emerging drone threats. Where was the exercise held, and what type of military exercise was it?",options:["Pokhran Field Firing Range, Jaisalmer, Rajasthan; a counter-unmanned aerial systems (Counter-UAS) exercise","Jodhpur Air Force Station, Rajasthan; a joint air-to-air refuelling exercise","Chabua Air Force Station, Assam; a strategic airlift and humanitarian assistance exercise","Kalaikunda Air Force Station, West Bengal; a surface-to-air missile defence exercise"],answer:0},
+{q:"During Exercise ROTOR CLAP-III, the Indian Air Force (IAF) tested helicopter-based operational concepts against emerging drone threats. Which activity was specifically undertaken to validate these concepts?",options:["Night-time maritime surveillance and underwater rescue operations using naval helicopters","Live missile and rocket firing to validate helicopter-based counter-drone operational concepts","Long-range transport operations and aerial refuelling during international deployment","Satellite-guided cargo delivery and high-altitude mountain rescue without weapons testing"],answer:1},
+{q:"Exercise ROTOR CLAP-III involved multiple helicopter platforms from the Indian Air Force (IAF) and Hindustan Aeronautics Limited (HAL). Which option lists only aircraft mentioned as participants in the exercise?",options:["Rafale, Mirage-2000, Jaguar, Tejas and MiG-29","C-17 Globemaster III, C-130J, Dornier 228 and P-8I","AH-64 Apache, Mi-25/35, HAL Prachand, CH-47 Chinook, Mi-17 and HAL Dhruv","Su-30MKI, Hawk, Sea King, ALH Mk-III and carrier-based MiG-29K"],answer:2},
+{q:"India hosted the BRICS Meeting of National Statistical Offices in Lucknow, Uttar Pradesh, on 3–4 August 2026. What was the official theme of the meeting?",options:["'Strengthening BRICS through Sustainable Development'","'Digital Transformation for Global Economic Cooperation'","'Statistics for Inclusive Growth and Financial Stability'","'Quality Statistics as a Driver of Change'"],answer:3},
+{q:"The BRICS Chamber of Commerce & Industry (BRICS CCI) celebrated its 14th Foundation Day on 24 July 2026. Which option correctly describes the organisation's establishment, headquarters and registration framework?",options:["Established in 2012; headquarters in New Delhi; registered under the Societies Registration Act, 1860, as a non-profit organisation","Established in 2010; headquarters in Mumbai; registered under the Companies Act, 2013, as a public-sector undertaking","Established in 2015; headquarters in Beijing; registered under the International Organisations Act, 1945, as an intergovernmental body","Established in 2012; headquarters in New Delhi; established as a statutory regulator under the Ministry of Commerce and Industry"],answer:0},
+{q:"The BRICS Chamber of Commerce & Industry (BRICS CCI) promotes trade, commerce, investment and business cooperation among BRICS countries. Which groups are specifically included among its focus areas?",options:["Large multinational banks, central banks, defence ministries and international lending institutions exclusively","Micro, Small and Medium Enterprises (MSMEs), start-ups, women entrepreneurs and young entrepreneurs","Public-sector oil companies, military contractors, foreign embassies and international courts","Agricultural cooperatives, state-owned railways, national statistical offices and maritime security agencies exclusively"],answer:1},
+{q:"The Centre for Development of Advanced Computing (C-DAC) and the Geological Survey of India (GSI) signed an umbrella Memorandum of Understanding (MoU) at Electronics Niketan, New Delhi. What is the primary objective of this collaboration?",options:["To establish a national network of digital payment systems and improve cybersecurity for commercial banks","To develop indigenous naval vessels and strengthen underwater rescue capabilities through defence technology","To strengthen geoscience, mineral exploration and disaster management by combining advanced technologies with geological expertise","To promote international tourism, establish sustainable transport systems and develop urban road infrastructure"],answer:2},
+{q:"The umbrella Memorandum of Understanding (MoU) between the Centre for Development of Advanced Computing (C-DAC) and the Geological Survey of India (GSI) combines their respective institutional strengths. Which combination correctly describes the contribution of each organisation?",options:["C-DAC provides geological mapping, while GSI develops India's PARAM series of supercomputers","C-DAC provides naval engineering expertise, while GSI manages national high-performance computing infrastructure","C-DAC provides mineral extraction equipment, while GSI develops digital payment platforms and cybersecurity tools","C-DAC contributes High-Performance Computing (HPC) capabilities, while GSI contributes geological expertise"],answer:3},
+{q:"The Centre for Development of Advanced Computing (C-DAC) is an Indian research and development organisation involved in information technology and associated areas. Which option correctly identifies its establishment year, headquarters and administrative ministry?",options:["Established in 1988; headquarters in Pune, Maharashtra; under the Ministry of Electronics and Information Technology (MeitY)","Established in 1985; headquarters in Kolkata, West Bengal; under the Ministry of Mines","Established in 1991; headquarters in Bengaluru, Karnataka; under the Ministry of Science and Technology","Established in 1988; headquarters in New Delhi; under the Ministry of Defence"],answer:0},
+{q:"The Geological Survey of India (GSI), which signed an MoU with the Centre for Development of Advanced Computing (C-DAC), has a long history in geological research and mineral exploration. Which option correctly states its establishment year and historical location mentioned in the provided details?",options:["Established in 1881, with its historical base in Pune, Maharashtra","Established in 1851, with its historical base in Kolkata, West Bengal","Established in 1941, with its historical base in Visakhapatnam, Andhra Pradesh","Established in 1961, with its historical base in New Delhi, Delhi"],answer:1},
+{q:"The Indian Navy (IN) is responsible for India's maritime defence, and its motto is 'Sham No Varunah'. Which option correctly identifies the motto's meaning, the Navy's headquarters and its Chief of Naval Staff as given in the provided details?",options:["'Service Before Self'; headquarters in Mumbai; Chief of Naval Staff Admiral R. Hari Kumar","'Touch the Sky with Glory'; headquarters in New Delhi; Chief of Naval Staff Air Chief Marshal A. P. Singh","'May the Lord of Water be Auspicious unto Us'; headquarters in New Delhi; Chief of Naval Staff Admiral Dinesh K. Tripathi","'Victory Through Courage'; headquarters in Visakhapatnam; Chief of Naval Staff Admiral Dinesh K. Tripathi"],answer:2},
+{q:"Gujarat's centuries-old Pithora Painting tradition received a Geographical Indication (GI) tag. Which option correctly identifies the authority that granted the tag and the earlier Gujarat products mentioned as having received GI recognition?",options:["Geological Survey of India (GSI); Gir Kesar Mango and Patan Patola","Ministry of Culture; Banarasi Saree and Mysore Silk","National Biodiversity Authority; Alphonso Mango and Darjeeling Tea","Geographical Indications Registry (GIR) under the Department for Promotion of Industry and Internal Trade (DPIIT); Unjha Cumin and Fennel from the Unjha region"],answer:3},
+
+{q:"The Indian Institute of Technology Hyderabad (IIT Hyderabad) and Crimson Energy Experts India Private Limited launched 'ANUGYAN', a three-month Nuclear Technology Orientation Programme (NTOP). What is the primary objective of this industry–academia initiative?",options:["To develop nuclear-powered transport systems and promote the export of nuclear fuel to neighbouring countries","To bridge the talent gap by developing skilled nuclear professionals to support India's planned expansion of nuclear power capacity","To establish a nuclear equipment manufacturing zone exclusively for exporting power-generation machinery","To train professionals in conventional thermal power generation and reduce dependence on renewable energy"],answer:1},
+{q:"India's first industry–academia nuclear technology programme, 'ANUGYAN', supports the country's long-term nuclear energy expansion plans. Which combination correctly identifies the targeted increase in nuclear power capacity and the target year?",options:["From 8.8 GW to 75 GW by 2035","From 10 GW to 100 GW by 2040","From 8.8 GW to 100 GW by 2047","From 12 GW to 100 GW by 2030"],answer:2},
+{q:"The Indian Institute of Technology Hyderabad (IIT Hyderabad), which partnered with Crimson Energy Experts India Private Limited for the ANUGYAN Nuclear Technology Orientation Programme (NTOP), is located in Telangana. Which option correctly identifies its location, establishment year and motto?",options:["Kandi, Sangareddy, Telangana; established in 2008; 'Inventing and Innovating in Technology for Humanity'","Warangal, Telangana; established in 2005; 'Knowledge for National Development'","Hyderabad, Telangana; established in 2010; 'Technology for Sustainable Growth'","Kandi, Sangareddy, Telangana; established in 2012; 'Innovation for a Better World'"],answer:0},
+{q:"The Indian Council of Agricultural Research (ICAR) developed India's first fully annotated Telomere-to-Telomere (T2T) reference genome of the pigeonpea variety 'Asha'. What is the principal purpose of this genomic achievement?",options:["To replace pigeonpea cultivation with genetically uniform cereal crops and reduce agricultural diversification","To increase the country's dependence on imported pulse varieties through advanced genomic research","To develop only ornamental legume varieties for commercial horticulture and export markets","To accelerate the development of climate-resilient, high-yielding and nutritionally enriched pigeonpea varieties"],answer:3},
+{q:"The Indian Council of Agricultural Research (ICAR) developed the fully annotated Telomere-to-Telomere (T2T) reference genome of pigeonpea variety 'Asha' in support of the Government of India's Mission for Aatmanirbharta in Pulses. Which option correctly identifies the mission period and production target?",options:["2024–25 to 2029–30, targeting 30 million tonnes by 2030","2025–26 to 2030–31, targeting 35 million tonnes by 2030–31","2025–26 to 2031–32, targeting 40 million tonnes by 2031–32","2026–27 to 2030–31, targeting 35 million tonnes by 2030"],answer:1},
+{q:"The Indian Council of Agricultural Research (ICAR) has contributed to pulse-crop genomics through earlier genome research and the recently developed reference genome of pigeonpea variety 'Asha'. Which statement correctly describes ICAR's earlier achievement and institutional details?",options:["ICAR developed the world's first draft genome of a pulse crop in 2017, followed by an improved version in 2020; it was established in 1947","ICAR developed the world's first draft genome of a cereal crop in 2011, followed by an improved version in 2015; it is headquartered in Mumbai","ICAR developed the world's first draft genome of a pulse crop in 2011, followed by an improved version in 2017; it was established in 1929 and is headquartered in New Delhi","ICAR developed the world's first fully annotated T2T pulse genome in 2011, followed by an improved version in 2017; it was established in 1961"],answer:2},
+{q:"Jupiter Wagons Limited (JWL) partnered with Italy's Lucchini RS Holding S.p.A. and SIMEST to establish India's first fully integrated private-sector railwheel manufacturing platform. Which option correctly describes the investment arrangement in Tatravagonka Railwheel Factory Private Limited (JTRWF)?",options:["Lucchini RS will acquire 15% and SIMEST 10%, giving them a combined 25% stake in JTRWF, through an investment worth EUR 28 million, approximately ₹307 crore","Lucchini RS will acquire 10% and SIMEST 15%, giving them a combined 25% stake, through an investment worth EUR 20 million, approximately ₹220 crore","Lucchini RS will acquire 25% and SIMEST 15%, giving them a combined 40% stake, through an investment worth EUR 28 million, approximately ₹307 crore","Lucchini RS and SIMEST will each acquire 25%, giving them a combined 50% stake, through an investment worth EUR 28 million, approximately ₹307 crore"],answer:0},
+{q:"The railwheel manufacturing partnership involving Jupiter Wagons Limited (JWL), Italy's Lucchini RS Holding S.p.A. and SIMEST is supported by the Government of Italy. Which option correctly identifies JWL's establishment year, corporate headquarters and registered office?",options:["Established in 1985; corporate headquarters in Jabalpur, Madhya Pradesh; registered office in Kolkata, West Bengal","Established in 1979; corporate headquarters in Mumbai, Maharashtra; registered office in Jabalpur, Madhya Pradesh","Established in 1980; corporate headquarters in Kolkata, West Bengal; registered office in New Delhi, Delhi","Established in 1979; corporate headquarters in Kolkata, West Bengal; registered office in Jabalpur, Madhya Pradesh"],answer:3},
+{q:"Air India and Azerbaijan Airlines (AZAL), part of AZCON Holding, signed a codeshare partnership to improve air connectivity between India and Azerbaijan. Under the arrangement described, how will Air India's designator code be used?",options:["Azerbaijan Airlines will place its 'AZ' code on all Air India domestic flights within India","Air India will place its 'AI' designator code on Azerbaijan Airlines' services, enabling passengers to book travel through Air India","Both airlines will discontinue their individual flight codes and operate all international flights under a new joint code","Air India will place its 'AI' code exclusively on Azerbaijan Airlines' cargo services, without passenger booking access"],answer:1},
+{q:"The codeshare partnership between Air India and Azerbaijan Airlines (AZAL) was signed by senior commercial officials from both airlines. Which option correctly identifies the signatories and their respective positions?",options:["Campbell Wilson, Chief Executive Officer of Air India, and Jamil Manizade, Chief Commercial Officer of Azerbaijan Airlines","Nipun Aggarwal, Chief Commercial Officer of Air India, and Bernard Fontana, Chief Executive Officer of EDF","Nipun Aggarwal, Chief Commercial Officer of Air India, and Jamil Manizade, Chief Commercial Officer of Azerbaijan Airlines","Jamil Manizade, Chief Executive Officer of Air India, and Nipun Aggarwal, Chief Commercial Officer of Azerbaijan Airlines"],answer:2},
+{q:"Air India was founded in 1932 by J. R. D. Tata and returned to Tata Group ownership in 2022. Which option correctly identifies the airline's headquarters and ownership details provided in the notes?",options:["Headquarters in Gurugram, Haryana; founded in 1932 by J. R. D. Tata; owned by Tata Sons since 2022","Headquarters in Mumbai, Maharashtra; founded in 1947 by the Government of India; returned to Tata Group in 2020","Headquarters in New Delhi; founded in 1932 by the Government of India; transferred to Tata Group in 2021","Headquarters in Gurugram, Haryana; founded in 1947 by J. R. D. Tata; owned by Tata Sons since 2019"],answer:0},
+{q:"NITI Aayog released a report titled 'Reimagining Care: Strategies for Empowering Caregivers in Viksit Bharat@2047' in New Delhi. What is the central objective of the roadmap proposed in this report?",options:["To introduce a nationwide pension system exclusively for retired government employees and public-sector workers","To replace informal family caregiving entirely with technology-based healthcare services and automated facilities","To establish an international medical tourism framework focused primarily on attracting foreign patients","To build an organised, professional and future-ready caregiving ecosystem in support of India's long-term development vision"],answer:3},
+{q:"The report 'Reimagining Care: Strategies for Empowering Caregivers in Viksit Bharat@2047' was released by NITI Aayog, the National Institution for Transforming India. Which pair of officials was identified as the signatories associated with the report?",options:["Nidhi Chhibber, Vice Chairperson, and Ashok Kumar Lahiri, CEO","Ashok Kumar Lahiri, Vice Chairperson, and Nidhi Chhibber, CEO","N. Chandrababu Naidu, Vice Chairperson, and Nidhi Chhibber, CEO","Ashok Kumar Lahiri, Chairperson, and Nipun Aggarwal, CEO"],answer:1},
+{q:"Pawan Hans Limited (PHL) signed a non-binding Memorandum of Understanding (MoU) with Norway's Noemi Aerospace, also identified as Elfly AS, to explore electric seaplane technology. What was the stated purpose and financial nature of the agreement?",options:["To immediately purchase a fleet of electric seaplanes through a binding contract involving a fixed financial commitment","To establish a joint aircraft manufacturing facility in India with a mandatory minimum investment by both parties","To explore collaboration opportunities in next-generation sustainable aviation technologies, without a binding financial commitment","To transfer ownership of Pawan Hans Limited to the Norwegian company and establish a joint airline for international travel"],answer:2},
+{q:"The non-binding Memorandum of Understanding (MoU) between Pawan Hans Limited (PHL) and Norway's Noemi Aerospace was signed in New Delhi. Which option correctly identifies the signatories and their positions?",options:["Sunil Kumar Nagdawne, Managing Director of Pawan Hans Limited, and Eric François Lithun, CEO of Noemi Aerospace","Nipun Aggarwal, Chief Commercial Officer of Pawan Hans, and Jamil Manizade, CEO of Noemi Aerospace","Eric François Lithun, Managing Director of Pawan Hans Limited, and Sunil Kumar Nagdawne, CEO of Noemi Aerospace","Sunil Kumar Nagdawne, CEO of Pawan Hans Limited, and Bernard Fontana, CEO of Noemi Aerospace"],answer:0},
+{q:"The Supreme Court of India (SCI), through a bench comprising Justice Sanjay Karol and Justice Prashant Kumar Mishra, extended the mandatory third-party insurance period for newly purchased vehicles by one year. What are the resulting coverage periods specified for new cars and two-wheelers?",options:["Cars: 3 years; two-wheelers: 5 years","Cars: 4 years; two-wheelers: 6 years","Cars: 5 years; two-wheelers: 5 years","Cars: 4 years; two-wheelers: 7 years"],answer:1},
+{q:"Third-party motor insurance is mandatory under the Motor Vehicles Act (MVA), 1988. The Supreme Court of India (SCI) extended the insurance coverage period for new vehicles by one year. Which pair of judges was associated with the decision described in the notes?",options:["Justice Surya Kant and Justice B. R. Gavai","Justice D. Y. Chandrachud and Justice Sanjiv Khanna","Justice Sanjay Karol and Justice Prashant Kumar Mishra","Justice Prashant Kumar Mishra and Justice B. V. Nagarathna"],answer:2},
+{q:"The implementation of mandatory third-party motor insurance in India involves the Insurance Regulatory and Development Authority of India (IRDAI). Which statement correctly describes the legal framework and the related policy mentioned in the notes?",options:["Third-party insurance is optional under the Motor Vehicles Act, 1988, and the 'No Insurance, No Fuel' policy is administered exclusively by the Ministry of Finance","Third-party insurance is mandatory under the Insurance Act, 1938, and the 'No Insurance, No Fuel' policy applies only to commercial transport vehicles","Third-party insurance is mandatory under the Motor Vehicles Act, 1988, but IRDAI has no role in implementation and the related policy applies only to electric vehicles","Third-party insurance is mandatory under the Motor Vehicles Act, 1988, with implementation by IRDAI; the related 'No Insurance, No Fuel' policy involves IRDAI and the Ministry of Road Transport and Highways (MoRTH)"],answer:3},
+{q:"The Nuclear Technology Orientation Programme (NTOP) 'ANUGYAN', the pigeonpea genome initiative, the railwheel manufacturing partnership and the caregiving ecosystem report each address different national development priorities. Which option correctly matches the initiative with its associated institution or organisation?",options:["ANUGYAN — IIT Hyderabad and Crimson Energy Experts India; T2T pigeonpea genome — Indian Council of Agricultural Research (ICAR); railwheel platform — Jupiter Wagons Limited with Lucchini RS and SIMEST; caregiving report — NITI Aayog","ANUGYAN — ICAR and Crimson Energy Experts India; T2T pigeonpea genome — IIT Hyderabad; railwheel platform — Air India and Azerbaijan Airlines; caregiving report — Pawan Hans","ANUGYAN — NITI Aayog and IIT Hyderabad; T2T pigeonpea genome — Jupiter Wagons Limited; railwheel platform — ICAR; caregiving report — Supreme Court of India","ANUGYAN — Pawan Hans and Noemi Aerospace; T2T pigeonpea genome — NITI Aayog; railwheel platform — Crimson Energy Experts India; caregiving report — ICAR"],answer:0},
+{q:"The Indian National Space Promotion and Authorisation Centre (IN-SPACe), functioning under the Department of Space (DoS), issued new guidelines on 23 July 2026 and made them public on 29 July 2026 for implementing the Indian Space Policy 2023. What is the primary purpose of these guidelines?", options:["To regulate satellite manufacturing costs and require all private space companies to transfer ownership of their spacecraft to ISRO.","To regulate planned spacecraft re-entry by private space entities and ensure safety, liability and accountability.","To prohibit private companies from operating satellites beyond Indian territory and transfer all launch activities to foreign agencies.","To establish a common pricing system for satellite communication services and restrict commercial launches to government-owned facilities."], answer:1},
+{q:"Under the Indian National Space Promotion and Authorisation Centre (IN-SPACe) guidelines for planned spacecraft re-entry, Indian entities must obtain authorisation before carrying out the activity. How must foreign entities seeking authorisation apply under the stated framework?", options:["They must apply directly to the Reserve Bank of India through an overseas banking institution.","They must obtain approval exclusively from the United Nations Office for Outer Space Affairs (UNOOSA).","They must apply through an Indian-incorporated entity.","They must obtain approval only from the Ministry of External Affairs without involving an Indian entity."], answer:2},
+{q:"The Indian National Space Promotion and Authorisation Centre (IN-SPACe) introduced spacecraft re-entry guidelines to ensure public safety during planned re-entry operations. What is the maximum casualty-risk threshold specified under these guidelines?", options:["Below 1 in 10,000.","Below 1 in 1,000.","Below 1 in 100,000.","Below 1 in 1,000,000."], answer:0},
+{q:"The second edition of the Candere Hurun India Women Leaders List 2026 was released by Candere, a luxury online jewellery brand owned by Kalyan Jewellers, in partnership with Hurun India. Which statement correctly describes the list's coverage compared with the previous edition?", options:["It recognised 97 women across 12 categories, compared with 117 women across 9 categories previously.","It recognised 117 women across 9 categories, compared with 97 women across 12 categories previously.","It recognised 107 women across 12 categories, compared with 97 women across 10 categories previously.","It recognised 117 women achievers across 12 categories, compared with 97 women across 9 categories in the previous edition."], answer:3},
+{q:"The Candere Hurun India Women Leaders List 2026 recognised women across business, startups, sports, journalism, literature, fashion and social impact. Which woman was recognised in the Wealth Multipliers category, with a reported net valuation of ₹2,84,120 crore?", options:["Priya Nair, Managing Director and Chief Executive Officer of Hindustan Unilever Limited.","Roshni Nadar Malhotra, Chairperson of HCL Technologies Limited.","Sudha Murty, author and philanthropist associated with Infosys Foundation.","Rajni Bector, entrepreneur and founder of Mrs. Bector's Food Specialities."], answer:1},
+{q:"According to the Candere Hurun India Women Leaders List 2026, Priya Nair was recognised in the Professional CEOs category. She serves as Managing Director (MD) and Chief Executive Officer (CEO) of which company, whose reported net valuation was ₹5.07 lakh crore?", options:["HCL Technologies Limited.","Kalyan Jewellers India Limited.","Hindustan Unilever Limited (HUL).","Nordex SE."], answer:2},
+{q:"The Candere Hurun India Women Leaders List 2026 reported a combined net worth of ₹39 trillion among the recognised women leaders. Which option correctly expresses this amount in Indian numbering terminology?", options:["₹39 lakh crore.","₹3.9 lakh crore.","₹390 lakh crore.","₹39,000 crore."], answer:0},
+{q:"Saudi Arabia and 13 other countries announced a Multinational Maritime Defence Alliance to protect shipping in important West Asian waterways and strengthen maritime security against threats. Which of the following countries was among the 13 other founding members listed in the announcement?", options:["United Arab Emirates.","Oman.","Iran.","Bangladesh."], answer:3},
+{q:"The Multinational Maritime Defence Alliance announced by Saudi Arabia and 13 other countries includes members from West Asia, Africa and South Asia. Which option contains only countries listed as founding members of the alliance?", options:["Saudi Arabia, United Arab Emirates, Oman and Iraq.","Kuwait, Bahrain, Qatar and Egypt.","Saudi Arabia, Iran, Israel and Lebanon.","Pakistan, India, Sri Lanka and Nepal."], answer:1},
+{q:"Venezuela announced its withdrawal from the International Criminal Court (ICC) under Interim President Delcy Eloína Rodríguez Gómez and notified the United Nations (UN). Under Article 127 of the Rome Statute, when does a withdrawal generally take effect?", options:["Immediately upon the announcement by the withdrawing government.","Six months after the notification is received by the ICC.","One year after notification of withdrawal.","Only after all remaining State Parties unanimously approve the withdrawal."], answer:2},
+{q:"Venezuela became a State Party to the Rome Statute in 2002 and subsequently announced its withdrawal from the International Criminal Court (ICC). Which option correctly identifies the ICC's headquarters and the date on which the Court was established?", options:["The Hague, Netherlands; 1 July 2002.","Geneva, Switzerland; 24 October 1945.","New York, USA; 1 January 2000.","Vienna, Austria; 17 July 1998."], answer:0},
+{q:"The Reserve Bank of India (RBI) postponed the implementation of its revised Basel III Pillar III disclosure rules by six months in response to implementation difficulties raised by stakeholders. What is the revised implementation date, replacing the earlier deadline of 30 September 2026?", options:["1 January 2027.","1 April 2027.","30 June 2027.","1 April 2028."], answer:1},
+{q:"The Reserve Bank of India (RBI) delayed its revised Basel III Pillar III disclosure requirements to allow banks additional time to address implementation difficulties. Which categories of banks are covered by the revised implementation timeline?", options:["Only public sector banks and private sector commercial banks.","Only small finance banks and payments banks.","Commercial banks, small finance banks and payments banks.","Only regional rural banks, urban cooperative banks and state cooperative banks."], answer:2},
+{q:"The Government of Odisha's Electronics and Information Technology Department signed a tripartite agreement with Digital Bharat Nidhi (DBN), under the Ministry of Communications, and Bharat Sanchar Nigam Limited (BSNL) to implement the amended BharatNet programme. What is the total project outlay and the targeted coverage under this agreement?", options:["₹3,384.82 crore, covering 50,000 villages under 6,799 Gram Panchayats.","₹3,385 crore, covering 40,000 villages under 5,799 Gram Panchayats.","₹3,384.82 crore, covering 60,000 villages under 6,799 Gram Panchayats.","₹3,500 crore, covering 50,000 villages under 7,000 Gram Panchayats."], answer:0},
+{q:"Under the amended BharatNet programme in Odisha, the planned rural connectivity infrastructure will provide optical fibre connectivity to villages and Gram Panchayats. Which combination of networking technologies is specified for the project?", options:["Wireless broadband and a star topology network using satellite links exclusively.","Asynchronous Transfer Mode (ATM) and a bus topology network using copper cables.","Internet Protocol–Multiprotocol Label Switching (IP-MPLS) technology and a ring topology network.","Near Field Communication (NFC) and a mesh topology network limited to mobile devices."], answer:2},
+{q:"The Department of Industries, Investment Promotion and Commerce (DIIPC) of the Tamil Nadu Government signed four Memorandums of Understanding (MoUs) with global companies to establish Global Capability Centres (GCCs), Research and Development (R&D) centres and a manufacturing facility. Which university was associated with the proposed ₹125 crore higher-education initiative?", options:["University of Melbourne, Australia.","University of Western Australia (UWA), located in Perth, Western Australia.","University of Auckland, New Zealand.","University of Queensland, Australia."], answer:1},
+{q:"As part of the four Memorandums of Understanding (MoUs) signed by the Tamil Nadu Government to attract investment, a South Korean company agreed to establish a manufacturing facility with a proposed investment of ₹300 crore. Which company was identified for this project?", options:["Nordex SE, a German wind turbine manufacturer.","Zurich Insurance Group, a Swiss financial services company.","Hindustan Unilever Limited, an Indian consumer goods company.","MotiveLink Co. Limited, a South Korean company."], answer:3},
+{q:"The Tamil Nadu Government's investment agreements included proposals for Global Capability Centres (GCCs) and Research and Development (R&D) centres involving companies from Germany and Switzerland. Which option correctly matches the companies with their countries of origin?", options:["Nordex SE – Switzerland; Zurich – Germany.","Nordex SE – South Korea; Zurich – Australia.","Nordex SE – Germany; Zurich – Switzerland.","Nordex SE – Australia; Zurich – South Korea."], answer:2},
+{q:"Which former Chief of Army Staff (COAS) of the Indian Army (IA), who passed away at the age of 91 in New Delhi, Delhi, received the Ati Vishisht Seva Medal (AVSM) in 1977 and the Param Vishisht Seva Medal (PVSM) in 1986?", options:["General Krishnaswamy Sundarji","General Vishwa Nath Sharma","General K. V. Krishna Rao","General Tapishwar Narain Raina"], answer:1},
+{q:"Franco Baresi, who passed away at the age of 66 in Milan, Italy, was associated with which football club as a legendary captain, and was the runner-up for the Ballon d’Or in which year?", options:["Juventus; 1990","Inter Milan; 1988","AC Milan; 1989","AS Roma; 1991"], answer:2},
+{q:"Which renowned Hindi writer, born in 1936 in Mhow, Indore district, Madhya Pradesh (MP), passed away at the age of 90 in Bhopal and received the Padma Shri in 2026?", options:["Kailash Chandra Pant","Vishwanath Tripathi","Namvar Singh","Ashok Vajpeyi"], answer:0},
+{q:"On 1 August 2026, Prime Minister (PM) Narendra Modi visited Andhra Pradesh (AP) and Karnataka to inaugurate and lay foundation stones for infrastructure, connectivity, energy and technology projects. What was the stated objective of this visit?", options:["To expand international defence cooperation and establish new military commands","To promote tourism exclusively through heritage conservation and cultural festivals","To establish agricultural research centres without expanding regional connectivity","To boost regional development and economic growth through major projects"], answer:3},
+{q:"During Prime Minister (PM) Narendra Modi’s visit to Andhra Pradesh (AP) on 1 August 2026, more than Rs 17,900 crore was invested in projects. Which airport was inaugurated at Bhogapuram in Vizianagaram district, at a project cost of Rs 5,640 crore?", options:["Tirupati International Airport, developed by Airports Authority of India","Alluri Sitarama Raju International Airport, developed by GMR Visakhapatnam International Airport Limited (GVIAL)","Rajahmundry International Airport, developed by the Ministry of Civil Aviation","Vijayawada International Airport, developed by GMR Airports Limited"], answer:1},
+{q:"Which cultural institution was inaugurated by Prime Minister (PM) Narendra Modi during his visit to Karnataka on 1 August 2026, as part of initiatives intended to support regional development and cultural engagement?", options:["Basava Cultural Heritage Centre in Bengaluru","Kuvempu National Literature Centre in Shivamogga","Swami Vivekananda Cultural Youth Centre in Mysuru","Rani Chennamma Youth Development Centre in Belagavi"], answer:2},
+{q:"A new freshwater catfish species was discovered in Odisha’s Budhabalanga River in Mayurbhanj district and named ‘Pseudolaguvia khairii’. In which international taxonomic journal was this discovery published?", options:["Nature Ecology & Evolution","Journal of Fish Biology","Indian Journal of Fisheries","Zootaxa"], answer:3},
+{q:"The newly discovered freshwater catfish species ‘Pseudolaguvia khairii’ was named to honour Khairi. Who or what was Khairi, whose name is associated with the species?", options:["An iconic Royal Bengal tigress of Similipal Tiger Reserve (STR), Odisha","A renowned conservationist who established the Budhabalanga River sanctuary","A freshwater fish researcher who classified the Siluriformes order","A historic tribal leader associated with wildlife conservation in Mayurbhanj"], answer:0},
+{q:"The newly discovered catfish species ‘Pseudolaguvia khairii’ belongs to which taxonomic order, which comprises all species of catfish?", options:["Cypriniformes","Siluriformes","Perciformes","Anabantiformes"], answer:1},
+{q:"Nepali-British mountaineer Nirmal Purja, who passed away at the age of 43 in an avalanche, was involved in the incident on which mountain in the Gilgit-Baltistan region of Pakistan?", options:["K2","Nanga Parbat","Broad Peak","Gasherbrum I"], answer:2},
+{q:"Nirmal Purja, the Nepali-British mountaineer who passed away in an avalanche on Broad Peak, achieved a record by becoming the first person to climb which three mountains within 48 hours?", options:["Everest, K2 and Cho Oyu","Lhotse, Makalu and K2","Everest, Annapurna and Dhaulagiri","Mount Everest, Lhotse and Makalu"], answer:3},
+{q:"The Government of Andhra Pradesh (AP) and Australia signed four Memoranda of Understanding (MoUs) in Amaravati, AP. Which set of sectors was identified for enhanced cooperation under these agreements?", options:["Clean energy, advanced manufacturing, inclusive education, student mental health and skill development","Defence production, nuclear weapons, maritime warfare, space exploration and intelligence sharing","Agricultural exports, petroleum refining, coal mining, conventional power and railway privatisation","Banking regulation, taxation, currency management, insurance supervision and stock-market operations"], answer:0},
+{q:"Which two parties signed four Memoranda of Understanding (MoUs) in Amaravati to strengthen cooperation in areas including clean energy, advanced manufacturing, inclusive education, student mental health and skill development?", options:["Government of Telangana and New Zealand","Government of Andhra Pradesh and Australia","Government of Karnataka and Canada","Government of Odisha and the United Kingdom"], answer:1},
+{q:"The Department of Posts (DoP), also known as India Post, released a Rs. 5 commemorative postage stamp to mark the birth centenary of which Padma Vibhushan awardee, recognised for contributions to Indian art, architecture and culture?", options:["M. F. Husain","S. H. Raza","Satish Gujral","Ram Kumar"], answer:2},
+{q:"The Department of Posts (DoP), under the Ministry of Communications, released a Rs. 5 commemorative postage stamp honouring Satish Gujral at Bikaner House, New Delhi. Who unveiled the stamp?", options:["Ashwini Vaishnaw, Ministry of Information and Broadcasting","Gajendra Singh Shekhawat, Ministry of Culture","Arjun Ram Meghwal, Ministry of Law and Justice","Jyotiraditya M. Scindia, Ministry of Communications"], answer:3},
+{q:"The commemorative postage stamp released by the Department of Posts (DoP) in honour of Satish Gujral marked which milestone in his life?", options:["His birth centenary, marking 100 years since his birth","The 75th anniversary of his first major art exhibition","The 50th anniversary of receiving the Padma Shri","The 25th anniversary of receiving the Padma Vibhushan"], answer:0},
+{q:"Satish Gujral, whose birth centenary was marked by a commemorative postage stamp released by India Post, received which civilian honour in 1999?", options:["Padma Shri","Padma Vibhushan","Padma Bhushan","Bharat Ratna"], answer:1},
+{q:"Who designed the Rs. 5 commemorative postage stamp released by the Department of Posts (DoP) to mark the birth centenary of Padma Vibhushan awardee Satish Gujral?", options:["Raseel Gujral Ansal","Jyotiraditya M. Scindia","Anuj Kumar","Satish Gujral"], answer:2},
+{q:"The commemorative postage stamp honouring Satish Gujral was designed by Anuj Kumar. Who proposed the stamp, which was released at Bikaner House, New Delhi, by Union Minister Jyotiraditya M. Scindia?", options:["Anuj Kumar","Department of Posts","Ministry of Culture","Raseel Gujral Ansal"], answer:3},
+{q:"Which of the following statements correctly combines the details of the commemorative postage stamp released by the Department of Posts (DoP) for Satish Gujral’s birth centenary?", options:["A Rs. 5 stamp released at Bikaner House, New Delhi; unveiled by Jyotiraditya M. Scindia; designed by Anuj Kumar; proposed by Raseel Gujral Ansal","A Rs. 10 stamp released in Bhopal; unveiled by the Union Minister of Culture; designed by Raseel Gujral Ansal; proposed by Anuj Kumar","A Rs. 5 stamp released in Mysuru; unveiled by the Prime Minister; designed by Satish Gujral; proposed by the Department of Culture","A Rs. 2 stamp released in Mumbai; unveiled by the Minister of Finance; designed by Jyotiraditya M. Scindia; proposed by India Post"], answer:0},
+{q:"According to the Environmental Performance Index (EPI) 2026 released by Yale University, which country secured the first position with a score of 74.79, while India ranked 176th out of 177 countries with a score of 22.46?", options:["Luxembourg","United Kingdom","Estonia","Finland"], answer:2},
+{q:"In the Environmental Performance Index (EPI) 2026, India ranked 176th out of 177 countries with a score of 22.46. Which institution released this index, and what was India's regional average score as reported in the given details?", options:["Yale University; 31.81","United Nations Environment Programme; 30.81","World Economic Forum; 32.46","World Bank; 29.81"], answer:0},
+{q:"According to the Environmental Performance Index (EPI) 2026, which country ranked second with a score of 74.24, followed by the United Kingdom (UK) in third place with 71.51?", options:["Finland","Luxembourg","Netherlands","Estonia"], answer:1},
+{q:"Which of the following correctly represents the top five countries in the Environmental Performance Index (EPI) 2026, released by Yale University?", options:["Estonia, United Kingdom, Luxembourg, Netherlands, Finland","Luxembourg, Estonia, Finland, United Kingdom, Netherlands","United Kingdom, Luxembourg, Estonia, Finland, Netherlands","Estonia, Luxembourg, United Kingdom, Finland, Netherlands"], answer:3},
+{q:"According to the Environmental Performance Index (EPI) 2026, India recorded a score of 22.46 and improved its score by 7.47 points over a decade. Which country ranked last among the 177 countries assessed?", options:["Laos","Bangladesh","Mali","Viet Nam"], answer:0},
+{q:"The Pacific island country of Nauru officially changed its name to the Republic of Naoero to reflect its traditional identity, national language and cultural heritage. Which combination of changes was associated with this transition?", options:["Country code NRU to NAU; citizens called Nauruan","Country code NRU to NRO; citizens called dei-Naoero","Country code NAU to NRO; citizens called Naoerans","Country code NRO to NRU; citizens called dei-Nauru"], answer:1},
+{q:"The Republic of Naoero, formerly known as Nauru, is a Pacific island country that became independent in 1968. Which currency does it use, and who is its president according to the given details?", options:["New Zealand dollar; Russ Kun","Fijian dollar; Sitiveni Rabuka","Australian dollar; David Adeang","US dollar; Hilda Heine"], answer:2},
+{q:"The Zoological Survey of India (ZSI), under the Ministry of Environment, Forest and Climate Change (MoEFCC), completed India's first detailed catalogue of Lepidoptera. How many species of butterflies and moths were identified in the catalogue?", options:["13,307 species","13,570 species","13,073 species","13,703 species"], answer:3},
+{q:"India's first detailed Catalogue of Lepidoptera, covering butterflies and moths, was completed by the Zoological Survey of India (ZSI). How many volumes does the catalogue contain, and in which journal was it published?", options:["22 volumes; Zootaxa","20 volumes; Nature","18 volumes; Indian Journal of Zoology","24 volumes; Science"], answer:0},
+{q:"Who authored the final volume of India's first detailed Catalogue of Lepidoptera, which was completed by the Zoological Survey of India (ZSI) and published in the journal Zootaxa?", options:["Dr. Rahul Joshi and Dr. Amanda Vincent","Dr. Rahul Joshi and Dr. Navneet Singh","Dr. Navneet Singh and Dr. D. Y. Patil","Dr. Manmohan Singh Liberhan and Dr. Rahul Joshi"], answer:1},
+{q:"The Greater Visakhapatnam Municipal Corporation (GVMC) signed a Memorandum of Cooperation (MoC) with the Government of Moscow, Russia, to strengthen collaboration in smart mobility and sustainable urban transport. During which event was the agreement signed?", options:["World Urban Forum in New Delhi","India–Russia Economic Summit in Mumbai","5th International Transport Summit in Moscow","Global Mobility Conference in Bengaluru"], answer:2},
+{q:"The Memorandum of Cooperation (MoC) between the Greater Visakhapatnam Municipal Corporation (GVMC) and the Government of Moscow focused on smart mobility and sustainable urban transport. Who represented GVMC and Moscow, respectively, according to the given details?", options:["Maksim Liksutov and Ketan Garg","The Mayor of Moscow and the Chief Secretary of Andhra Pradesh","Ketan Garg and the Governor of Andhra Pradesh","Ketan Garg and Maksim Liksutov"], answer:3},
+{q:"Niyo Forex, operating through Kanji Forex Private Limited, and GlobalPay, operated by WSFx Global Pay Limited, secured perpetual and expanded perpetual Authorised Dealer Category II (AD II) licences. Which institution granted these licences under the updated Foreign Exchange Management Act (FEMA) 2026 regulations?", options:["Reserve Bank of India (RBI)","Securities and Exchange Board of India (SEBI)","Ministry of Finance","National Payments Corporation of India (NPCI)"], answer:0},
+{q:"The perpetual Authorised Dealer Category II (AD II) licences secured by Niyo Forex and GlobalPay are intended to help scale which types of financial operations under the updated Foreign Exchange Management Act (FEMA) 2026 regulations?", options:["Domestic stock trading, securities underwriting and mutual fund management","Cross-border payments, family remittances and non-trade transactions","Government bond issuance, monetary policy operations and interbank lending","Agricultural lending, insurance underwriting and pension fund administration"], answer:1},
+{q:"According to the static details provided, Niyo Forex, which operates through Kanji Forex Private Limited, has its registered office in Mumbai, Maharashtra. In which year was the company incorporated?", options:["1986","2001","1998","2010"], answer:2},
+{q:"A new seahorse species named ‘Hippocampus amandavincentae’ was identified by researchers from the Kerala University of Fisheries and Ocean Studies (KUFOS). It is reported as the fifth seahorse species recorded from the Kerala coast. In which journal was the discovery published?", options:["Nature Ecology & Evolution","Indian Journal of Fisheries","Marine Biology Research","Zootaxa"], answer:3},
+{q:"The new seahorse species ‘Hippocampus amandavincentae’ was identified near Tuticorin Fisheries Harbour in Tamil Nadu (TN) and during surveys off Anchuthengu, Kerala. After whom was the species named?", options:["Amanda Vincent, an internationally renowned marine biologist","A researcher who founded the Kerala University of Fisheries and Ocean Studies","A conservationist associated with the Zoological Survey of India","A fisheries scientist who first classified all thorny seahorses"], answer:0},
+{q:"The Kerala University of Fisheries and Ocean Studies (KUFOS), which identified the new seahorse species ‘Hippocampus amandavincentae’, was established in which year and is located in which city and state, according to the given static details?", options:["2008; Thiruvananthapuram, Kerala","2010; Kochi, Kerala","2012; Kozhikode, Kerala","2010; Chennai, Tamil Nadu"], answer:1},
+{q:"Dr. Dnyandeo Yashwantrao (D. Y.) Patil, former Governor of Tripura and Bihar and a renowned educationist, passed away at the age of 90 in Kasba Bawda, Kolhapur, Maharashtra. Which civilian award did he receive in 1991?", options:["Padma Bhushan","Padma Vibhushan","Padma Shri","Bharat Ratna"], answer:2},
+{q:"Dr. D. Y. Patil, popularly known as ‘Dada’ and ‘Shikshanmaharshi’, founded the D. Y. Patil Group in 1983. Which statement correctly describes the group's growth according to the given details?", options:["It expanded to 82 educational institutions and 3 universities, with a focus only on engineering","It grew into 182 educational institutions and 5 universities, without healthcare systems","It established 150 educational institutions and 7 universities, primarily outside India","It grew into over 182 educational institutions, 7 universities and premier healthcare systems across India"], answer:3},
+{q:"Justice Manmohan Singh Liberhan, who passed away at the age of 87, served as Chief Justice of which two High Courts (HCs), according to the given details?", options:["Madras High Court and Andhra Pradesh High Court","Bombay High Court and Karnataka High Court","Delhi High Court and Punjab and Haryana High Court","Allahabad High Court and Patna High Court"], answer:0},
+{
+    q: "The Union Cabinet, chaired by Prime Minister (PM) Narendra Modi, approved the Galvanizing Organic Bio-Agro Resources Dhan (GOBARdhan) scheme with an allocation of Rs 23,731 crore. The scheme aims to convert India's organic waste resources into clean energy and significantly expand domestic Compressed Biogas (CBG) production. Which of the following correctly describes its implementation and duration?",
+    options: [
+      "Implemented by the Ministry of New and Renewable Energy for 5 years, from FY27 to FY32",
+      "Implemented by the Ministry of Petroleum and Natural Gas for 10 years, from FY27 to FY36",
+      "Implemented by the Ministry of Environment, Forest and Climate Change for 10 years, from FY26 to FY35",
+      "Implemented by the Ministry of Rural Development for 8 years, from FY27 to FY34"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Galvanizing Organic Bio-Agro Resources Dhan (GOBARdhan) scheme has been approved with a budget of Rs 23,731 crore. One of its major objectives is to increase domestic Compressed Biogas (CBG) production by nearly 10 times by transforming organic waste into clean energy. What is the approved implementation period of this scheme?",
+    options: [
+      "FY2026–FY2035",
+      "FY2028–FY2037",
+      "FY2027–FY2036",
+      "FY2027–FY2032"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Cabinet Committee on Economic Affairs (CCEA), chaired by Prime Minister (PM) Narendra Modi, approved a major four-lane access-controlled National Highway (NH) project in Assam. The project is intended to improve connectivity along the Guwahati–Tezpur corridor. What is the approximate length and approved cost of this project?",
+    options: [
+      "135.87 km and Rs 8,970 crore",
+      "153.87 km and Rs 8,970 crore",
+      "135.87 km and Rs 9,870 crore",
+      "125.87 km and Rs 8,790 crore"
+    ],
+    answer: 0
+  },
+  {
+    q: "Squadron Leader Bhawana Kanth became the first woman fighter pilot of the Indian Air Force (IAF) to successfully complete the prestigious Fighter Combat Leader (FCL) course. The advanced combat programme is conducted by which institution, and at which location was it held?",
+    options: [
+      "Air Force Academy (AFA) – Dundigal, Telangana",
+      "College of Air Warfare (CAW) – Secunderabad, Telangana",
+      "Tactics and Air Combat Development Establishment (TACDE) – Gwalior, Madhya Pradesh",
+      "Air Force Technical College (AFTC) – Bengaluru, Karnataka"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Fighter Combat Leader (FCL) course is an elite advanced combat programme of the Indian Air Force (IAF), often associated with its 'Top Gun' school. Squadron Leader Bhawana Kanth created history by becoming the first woman graduate of this institution. Approximately what percentage of IAF pilots are selected for this 20-week advanced combat programme?",
+    options: [
+      "About 5%",
+      "About 1%",
+      "About 10%",
+      "About 2.5%"
+    ],
+    answer: 1
+  },
+  {
+    q: "Lohia Aerospace Systems Private Limited (LASPL) signed a Memorandum of Understanding (MoU) with Israel-based Massivit to establish India's first commercial large-format additive manufacturing facility. The facility is planned in Kanpur, Uttar Pradesh, with an investment of USD 8–10 million. Over what period is the facility expected to be established?",
+    options: [
+      "Over the next 3–4 years",
+      "Within the next 6 months",
+      "Over the next 2–3 years",
+      "Over the next 1–2 years"
+    ],
+    answer: 3
+  },
+  {
+    q: "Lohia Aerospace Systems Private Limited (LASPL) entered into a partnership with Israel-based Massivit to establish India's first commercial large-format additive manufacturing facility. The project, which supports the Aatmanirbhar Bharat initiative, will be located in which city and state?",
+    options: [
+      "Kanpur, Uttar Pradesh",
+      "Pune, Maharashtra",
+      "Ahmedabad, Gujarat",
+      "Hyderabad, Telangana"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Reserve Bank of India (RBI) identified 17 Non-Banking Financial Companies (NBFCs) for inclusion in the Upper Layer for Financial Year 2026–27 (FY27). The list was prepared with reference to the financial position of these companies as on which date?",
+    options: [
+      "March 31, 2025",
+      "December 31, 2025",
+      "March 31, 2026",
+      "June 30, 2026"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Reserve Bank of India (RBI) expanded its list of Upper Layer Non-Banking Financial Companies (NBFCs) from 15 in January 2025 to 17 for FY2026–27. Which of the following combinations correctly identifies the four newly added entities?",
+    options: [
+      "REC, PFC, IRFC and HUDCO",
+      "NABARD, SIDBI, IRFC and HUDCO",
+      "REC, PFC, NABARD and EXIM Bank",
+      "PFC, HUDCO, LIC Housing Finance and NABARD"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Reserve Bank of India (RBI) retained Tata Sons, the unlisted parent company of the Tata Group, in the Upper Layer category of Non-Banking Financial Companies (NBFCs) for FY2026–27. How many NBFCs were identified in the Upper Layer list for this financial year?",
+    options: [
+      "15",
+      "16",
+      "18",
+      "17"
+    ],
+    answer: 3
+  },
+  {
+    q: "SBI Life Insurance Company Limited entered into a corporate agency partnership with Jammu & Kashmir Bank Limited (J&K Bank) to distribute and service insurance products through the bank's branch network across India. The partnership aims to strengthen financial inclusion and support the Insurance Regulatory and Development Authority of India (IRDAI)'s vision of 'Insurance for All by 2047'. Which two organisations signed this partnership?",
+    options: [
+      "State Bank of India and Jammu & Kashmir Bank",
+      "SBI Life Insurance Company Limited and Jammu & Kashmir Bank Limited",
+      "SBI Life Insurance Company Limited and Punjab National Bank",
+      "Life Insurance Corporation of India and Jammu & Kashmir Bank"
+    ],
+    answer: 1
+  },
+  {
+    q: "SBI Life Insurance Company Limited, which was established in March 2001, is a joint venture between the State Bank of India (SBI) and which of the following financial institutions?",
+    options: [
+      "AXA Group",
+      "Allianz SE",
+      "BNP Paribas Cardif",
+      "Prudential plc"
+    ],
+    answer: 2
+  },
+  {
+    q: "Standard Chartered Bank received approval from the International Financial Services Centres Authority (IFSCA) to offer wealth management products and services through its branch in Gujarat International Finance Tec-City (GIFT City), Gandhinagar, Gujarat. In which year was IFSCA established?",
+    options: [
+      "2018",
+      "2020",
+      "2022",
+      "2015"
+    ],
+    answer: 1
+  },
+  {
+    q: "Standard Chartered Bank received approval to offer wealth management products and services from GIFT City. Apart from wealth management, its GIFT City branch also operates in lending, trade finance, transaction services and financial markets products. Approximately what market share does the bank hold among Regional Treasury Centres (RTCs) operating from GIFT City?",
+    options: [
+      "Approximately 25%",
+      "Approximately 40%",
+      "Approximately 60%",
+      "Approximately 50%"
+    ],
+    answer: 3
+  },
+  {
+    q: "Standard Chartered Bank was formed in 1969 through the merger of two banks. Which of the following correctly identifies the two institutions whose merger resulted in the formation of Standard Chartered Bank?",
+    options: [
+      "Standard Bank and Chartered Bank",
+      "Standard Bank and HSBC",
+      "Chartered Bank and Barclays Bank",
+      "Standard Bank and Lloyds Bank"
+    ],
+    answer: 0
+  },
+  {
+    q: "Indian Bank approved loans worth Rs 500 crore for 128 beneficiaries during its Credit Outreach Programme, organised as part of its 120th Foundation Day Fortnight Celebrations in New Delhi. What was the total value of credit proposals received during the programme?",
+    options: [
+      "Rs 1,000 crore",
+      "Rs 1,250 crore",
+      "Rs 1,500 crore",
+      "Rs 750 crore"
+    ],
+    answer: 1
+  },
+  {
+    q: "Indian Bank introduced a digital lending process for Micro, Small and Medium Enterprises (MSME) customers during its 120th Foundation Day celebrations. The process enables faster and paperless loan processing, with in-principle approval in approximately how much time and documentation through which method?",
+    options: [
+      "About 15 minutes with Aadhaar-based biometric documentation",
+      "About 60 minutes with physical documentation",
+      "About 30 minutes with One-Time Password (OTP)-based digital documentation",
+      "About 45 minutes with video-based documentation"
+    ],
+    answer: 2
+  },
+  {
+    q: "India successfully conducted a flight test of the Agni-4 Medium-Range Ballistic Missile (MRBM) from the Integrated Test Range (ITR), Chandipur, in Odisha. The test was conducted by the Strategic Forces Command (SFC) and the Defence Research and Development Organisation (DRDO). What is the stated range of the Agni-4 missile?",
+    options: [
+      "3,000 km",
+      "5,000 km",
+      "2,000 km",
+      "4,000 km"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Agni-4 Medium-Range Ballistic Missile (MRBM), tested at Chandipur in Odisha, has a stated range of 4,000 km and can carry a payload of up to 1,000 kg. Which of the following correctly represents its approximate weight and length?",
+    options: [
+      "17,000 kg and 20 metres",
+      "15,000 kg and 18 metres",
+      "17,000 kg and 15 metres",
+      "20,000 kg and 22 metres"
+    ],
+    answer: 0
+  },
+  {
+    q: "England fast bowler John Turner announced his retirement from professional cricket at the age of 25, bringing an end to his five-year professional career spanning 2021–2026. How many One Day Internationals (ODIs) and Twenty20 Internationals (T20Is) did he represent England in?",
+    options: [
+      "Four ODIs and two T20Is",
+      "Two ODIs and two T20Is",
+      "Two ODIs and four T20Is",
+      "Three ODIs and three T20Is"
+    ],
+    answer: 1
+  },
+
+{
+    q: "IIT Madras Global Research Foundation (IITM Global) signed a Memorandum of Understanding (MoU) with the Ministry of Higher Education, Science and Technology of Indonesia to strengthen cooperation in higher education, research, innovation, deep technology, entrepreneurship and talent development. Which Indonesian minister visited IIT Madras during the signing of this agreement?",
+    options: [
+      "Prof. Brian Yuliarto",
+      "Prof. Prasanta Chandra Mahalanobis",
+      "Prof. V. Kamakoti",
+      "Dr. Jitendra Singh"
+    ],
+    answer: 0
+  },
+  {
+    q: "IIT Madras, established in 1959, is an Institute of National Importance located in Chennai, Tamil Nadu. It was established with assistance from the Government of West Germany and is recognised as the first Indian Institute of Technology (IIT) established with international assistance. Under which Union Ministry does IIT Madras function?",
+    options: [
+      "Ministry of Science and Technology",
+      "Ministry of Education",
+      "Ministry of Electronics and Information Technology",
+      "Ministry of Skill Development and Entrepreneurship"
+    ],
+    answer: 1
+  },
+  {
+    q: "The National e-Governance Division (NeGD), under the Ministry of Electronics and Information Technology (MeitY), partnered with the Association of Australian Education Representatives in India (AAERI) to launch 'AAERI Verify'. What is the primary purpose of this platform?",
+    options: [
+      "To provide scholarships to Indian students studying in Australia",
+      "To issue digital passports to students applying for overseas education",
+      "To authenticate and verify student credentials for Indian students applying to Australian higher education institutions",
+      "To conduct online entrance examinations for Australian universities"
+    ],
+    answer: 2
+  },
+  {
+    q: "The 'AAERI Verify' platform introduced by the National e-Governance Division (NeGD) uses a secure two-stage digital workflow to replace slow manual verification of student credentials. Which of the following correctly describes the sequence of these two stages?",
+    options: [
+      "Sponsor Check before application, followed by Student Check after admission",
+      "University Check before application, followed by Visa Check after admission",
+      "Student Check after admission, followed by Sponsor Check before application",
+      "Student Check before the university application process, followed by Sponsor Check immediately after the admission offer"
+    ],
+    answer: 3
+  },
+  {
+    q: "Union Minister Dr. Jitendra Singh dedicated 'Prakriti Gyan Dham', an eco-educational hub developed by the Council of Scientific and Industrial Research–National Botanical Research Institute (CSIR-NBRI), to the nation. At which location in Uttar Pradesh has this eco-educational hub been established?",
+    options: [
+      "Maharishi Parashar Bioresource Centre, Banthra, Lucknow",
+      "CSIR-Central Drug Research Institute, Gomti Nagar, Lucknow",
+      "Indian Institute of Technology Kanpur, Kanpur",
+      "National Botanical Garden, Varanasi"
+    ],
+    answer: 0
+  },
+  {
+    q: "As part of 'Prakriti Gyan Dham', the Council of Scientific and Industrial Research–National Botanical Research Institute (CSIR-NBRI) developed an interpretive heritage trail that serves as the central experiential component of the eco-educational hub. What is the name of this trail, whose full form is Plants and Associated Vegetations for Appreciating Nature?",
+    options: [
+      "Bamboosteum",
+      "PAaVan Path",
+      "Prakriti Vatika",
+      "Vanaspati Marg"
+    ],
+    answer: 1
+  },
+  {
+    q: "The 'Bamboosteum' established at Prakriti Gyan Dham is a botanical feature showcasing bamboo diversity. According to the details provided, how many indigenous and exotic bamboo species does it house?",
+    options: [
+      "38",
+      "48",
+      "43",
+      "53"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Government of India notified 11 additional international ports through which foreign nationals holding Indian electronic visas (e-Visas) can enter India. These additions comprise land ports and airports. What is the correct distribution of the 11 newly added ports?",
+    options: [
+      "8 land ports and 3 airports",
+      "7 land ports and 4 airports",
+      "10 land ports and 1 airport",
+      "9 land ports and 2 airports"
+    ],
+    answer: 3
+  },
+  {
+    q: "Following the addition of 11 international ports for entry of foreign nationals holding Indian electronic visas (e-Visas), the total number of designated international ports in India increased to 88. Which of the following correctly represents the distribution of these ports?",
+    options: [
+      "37 airports, 38 seaports and 13 land ports",
+      "38 airports, 37 seaports and 13 land ports",
+      "37 airports, 39 seaports and 12 land ports",
+      "36 airports, 38 seaports and 14 land ports"
+    ],
+    answer: 0
+  },
+  {
+    q: "India's electronic visa (e-Visa) facility was introduced in 2014 and was initially available to nationals of 43 countries. According to the supplied details, how many countries are currently eligible for India's e-Visa facility, and approximately what percentage of applications are processed within 72 hours?",
+    options: [
+      "162 countries and 90%",
+      "172 countries and 95%",
+      "175 countries and 85%",
+      "182 countries and 95%"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Indian Navy and the United States Navy (US Navy) conducted the 8th edition of their Explosive Ordnance Disposal (EOD) Exercise in August 2026. The five-day exercise involved Subject Matter Expert (SME) exchanges, cross-training, equipment demonstrations and scenario-based practical exercises. Where was this exercise conducted?",
+    options: [
+      "Eastern Naval Command, Visakhapatnam",
+      "Western Naval Command, Mumbai",
+      "Southern Naval Command, Kochi",
+      "Andaman and Nicobar Command, Port Blair"
+    ],
+    answer: 2
+  },
+  {
+    q: "The 8th India–United States Navy (US Navy) Explosive Ordnance Disposal (EOD) Exercise 2026 was conducted from 10 to 14 August 2026 to enhance interoperability, operational skills and knowledge-sharing in EOD and Salvage operations. Since which year have the Indian Navy and US Navy been conducting joint Salvage and EOD exercises?",
+    options: [
+      "2000",
+      "2010",
+      "2008",
+      "2005"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Ministry of Statistics and Programme Implementation (MoSPI) signed two Memoranda of Understanding (MoUs) with the Institute of Data Engineering, Analytics and Science Foundation (IDEAS), associated with the Indian Statistical Institute (ISI), Kolkata. One of the research projects involves developing a desktop-based software tool for which purpose?",
+    options: [
+      "Gross Domestic Product (GDP) nowcasting",
+      "Consumer Price Index (CPI) forecasting",
+      "Foreign Direct Investment (FDI) estimation",
+      "Unemployment rate prediction"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Ministry of Statistics and Programme Implementation (MoSPI) and the Institute of Data Engineering, Analytics and Science Foundation (IDEAS) signed two MoUs to develop a research collaboration platform. One of the proposed studies will link administrative data from government health, nutrition and well-being schemes with which dataset?",
+    options: [
+      "Annual Survey of Industries (ASI) data",
+      "Household-level National Sample Survey (NSS) data",
+      "Census of India data",
+      "Agricultural Census data"
+    ],
+    answer: 1
+  },
+  {
+    q: "The National Accreditation Board for Testing and Calibration Laboratories (NABL), functioning under the Quality Council of India (QCI), launched India's first Accreditation Scheme for Mobile Food Testing Laboratories. Under which programme was this scheme launched?",
+    options: [
+      "National Food Safety Mission",
+      "Integrated Food Monitoring Programme",
+      "Integrated Assessment Programme",
+      "National Laboratory Modernisation Programme"
+    ],
+    answer: 2
+  },
+  {
+    q: "The National Accreditation Board for Testing and Calibration Laboratories (NABL) launched India's first accreditation scheme for mobile food testing laboratories during the 'Gunvatta Samanvaya – A Multilateral MoU Exchange Ceremony' in New Delhi. What is the primary objective of this accreditation scheme?",
+    options: [
+      "To establish a nationwide network of food manufacturing units",
+      "To provide subsidies for purchasing food testing equipment",
+      "To replace all existing food safety regulations with a single standard",
+      "To expand access to reliable, quality-assured and internationally benchmarked food testing services closer to communities"
+    ],
+    answer: 3
+  },
+  {
+    q: "Indian Institute of Technology Delhi (IIT Delhi) held its 57th Convocation Ceremony at its Sonipat campus in Haryana, with Prime Minister Narendra Modi as the Chief Guest. During the event, an AI-powered high-performance supercomputing facility was inaugurated. What is the name of this facility?",
+    options: [
+      "Param Pragya",
+      "Param Siddhi",
+      "Param Shakti",
+      "Param Ganga"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Department for Promotion of Industry and Internal Trade (DPIIT), under the Ministry of Commerce and Industry, signed strategic Memoranda of Understanding (MoUs) with several industry partners to strengthen India's startup ecosystem. Which of the following companies partnered with DPIIT to improve access to cloud computing and digital infrastructure for DPIIT-recognised startups?",
+    options: [
+      "Cashfree Payments",
+      "Vultr India",
+      "Cars24 Services",
+      "Darwin Dynamics"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Indian Navy's next-generation Offshore Patrol Vessel (NGOPV), Yard 3037 'Shruti', was launched by Garden Reach Shipbuilders and Engineers (GRSE) Limited at Kolkata, West Bengal. The NGOPV programme is being undertaken concurrently by GRSE and which other shipbuilding company?",
+    options: [
+      "Cochin Shipyard Limited (CSL)",
+      "Mazagon Dock Shipbuilders Limited (MDL)",
+      "Goa Shipyard Limited (GSL)",
+      "Hindustan Shipyard Limited (HSL)"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Indian Navy's next-generation Offshore Patrol Vessel (NGOPV) 'Shruti' is designed for maritime surveillance, search and rescue, protection of offshore assets, Humanitarian Assistance and Disaster Relief (HADR), and anti-piracy operations. Which of the following correctly identifies the shipyard that built and launched this vessel and its headquarters?",
+    options: [
+      "Goa Shipyard Limited – Vasco da Gama, Goa",
+      "Mazagon Dock Shipbuilders Limited – Mumbai, Maharashtra",
+      "Cochin Shipyard Limited – Kochi, Kerala",
+      "Garden Reach Shipbuilders and Engineers Limited – Kolkata, West Bengal"
+    ],
+    answer: 3
+  },
+
+{
+    q: "The Ministry of Micro, Small and Medium Enterprises (MSME) and the Department for Promotion of Industry and Internal Trade (DPIIT) signed a Memorandum of Understanding (MoU) at Vanijya Bhawan, New Delhi, to promote India's Geographical Indication (GI) products and traditional industries. Under the agreement, GI collectives and authorised users will be onboarded onto which two digital platforms under the 'Bharat GI' banner?",
+    options: [
+      "Startup India and Digital India",
+      "Government e-Marketplace (GeM) and Open Network for Digital Commerce (ONDC)",
+      "National Scholarship Portal (NSP) and GeM",
+      "ONDC and Government e-Tendering Portal"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Department for Promotion of Industry and Internal Trade (DPIIT), under the Ministry of Commerce and Industry, acts as the nodal department for Geographical Indication (GI) registration and legal protection in India. It was originally established in 1995 under which name before being renamed DPIIT in 2019?",
+    options: [
+      "Department of Industrial Development and Trade",
+      "Department of Commerce and Internal Trade",
+      "Department of Industrial Policy and Promotion (DIPP)",
+      "Department of Industry and Public Enterprises"
+    ],
+    answer: 2
+  },
+  {
+    q: "During the Fourth Session of the India–Namibia Joint Trade Committee (JTC) held in New Delhi, both countries agreed to deepen bilateral trade and economic cooperation. According to the details provided, what was the value of bilateral trade between India and Namibia in 2025–26?",
+    options: [
+      "USD 592.94 million",
+      "USD 568.40 million",
+      "USD 592.40 million",
+      "USD 620.94 million"
+    ],
+    answer: 0
+  },
+  {
+    q: "India and Namibia discussed trade expansion during the Fourth Session of their Joint Trade Committee (JTC). In 2025–26, India's exports to Namibia amounted to USD 349.09 million, while imports from Namibia amounted to which of the following values?",
+    options: [
+      "USD 253.85 million",
+      "USD 243.58 million",
+      "USD 234.85 million",
+      "USD 243.85 million"
+    ],
+    answer: 3
+  },
+  {
+    q: "India's engineering exports to Namibia recorded significant growth during the bilateral trade discussions. According to the details of the Fourth India–Namibia Joint Trade Committee (JTC) session, by what percentage did engineering exports increase, and what was their reported value?",
+    options: [
+      "124.06% to USD 30.24 million",
+      "124.60% to USD 36.50 million",
+      "102.46% to USD 30.42 million",
+      "114.06% to USD 32.04 million"
+    ],
+    answer: 0
+  },
+  {
+    q: "India became Namibia's second-largest pharmaceutical source, with a 16.4% share, during the period covered in the bilateral trade discussions. What was the reported value of India's pharmaceutical and medical-device trade with Namibia?",
+    options: [
+      "USD 30.24 million",
+      "USD 36.50 million",
+      "USD 38.60 million",
+      "USD 35.60 million"
+    ],
+    answer: 1
+  },
+  {
+    q: "India donated five Indian peacocks, including one rare white-feathered male, to the United Nations Office at Geneva (UNOG). The peacocks were formally handed over by India's Permanent Representative to the UN in Geneva, Arindam Bagchi, to UNOG Director-General Tatiana Valovaya. What was the composition of the donated group?",
+    options: [
+      "Three blue peafowls and two white-feathered males",
+      "Five blue peafowls",
+      "Four blue peafowls and one white-feathered male",
+      "Three blue peafowls, one white-feathered male and one female white peafowl"
+    ],
+    answer: 2
+  },
+  {
+    q: "India presented five peacocks to the United Nations Office at Geneva (UNOG), with the blue and white colours reflecting those associated with the United Nations. This was the second time India had presented peacocks to UNOG. In which year did former Prime Minister Indira Gandhi send a breeding pair from Delhi Zoo?",
+    options: [
+      "1975",
+      "1991",
+      "1985",
+      "1981"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Indian peafowl, India's national bird, was among the species donated by India to the United Nations Office at Geneva (UNOG). Which of the following correctly identifies its scientific name and family?",
+    options: [
+      "Pavo cristatus – Phasianidae",
+      "Pavo muticus – Columbidae",
+      "Gallus gallus – Phasianidae",
+      "Pavo cristatus – Anatidae"
+    ],
+    answer: 0
+  },
+  {
+    q: "Union Minister for Agriculture and Farmers' Welfare and Rural Development Shivraj Singh Chouhan released scholarship and fellowship funds for agriculture students through the National Scholarship Portal (NSP) at ICAR–Indian Agricultural Research Institute (IARI), Pusa, New Delhi. More than how many students benefited from the release of Rs 21.35 crore?",
+    options: [
+      "5,000 students",
+      "6,000 students",
+      "7,500 students",
+      "8,000 students"
+    ],
+    answer: 1
+  },
+  {
+    q: "The National Scholarship Portal (NSP) is a Government of India platform that provides a single-window system for scholarship application, processing, sanction and disbursement. Under the new agriculture scholarship initiative, how will students receive their scholarship funds?",
+    options: [
+      "Through annual payments made directly to educational institutions",
+      "Through quarterly payments by cheque",
+      "Through monthly Direct Benefit Transfer (DBT) directly to students",
+      "Through one-time cash payments at the time of admission"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Central Council for Research in Ayurvedic Sciences (CCRAS) and the Bureau of Indian Standards (BIS) signed an MoU to advance quality standards, conformity assessment, scientific research and capacity building for the Ayush sector. This agreement was significant because it was the 100th MoU of BIS and its first MoU with which type of organisation?",
+    options: [
+      "A pharmaceutical manufacturing company",
+      "An international standards organisation",
+      "A private medical university",
+      "An Ayush organisation"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Central Council for Research in Ayurvedic Sciences (CCRAS), functioning under the Ministry of Ayush, is the apex research organisation for Ayurveda and related sciences. Which official signed the MoU on behalf of CCRAS along with Shri Sanjay Pant, Deputy Director General of the Bureau of Indian Standards (BIS)?",
+    options: [
+      "Prof. (Vaidya) Rabinarayan Acharya",
+      "Vaidya Rajesh Kotecha",
+      "Dr. V. Kalaiselvan",
+      "Shri Amitabh Nag"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Digital India BHASHINI Division (DIBD), under Digital India Corporation (DIC), Ministry of Electronics and Information Technology (MeitY), signed a Statement of Intent (SoI) with NITI Aayog to advance multilingual, voice-first Artificial Intelligence (AI) solutions. What is the primary objective of this collaboration?",
+    options: [
+      "To establish a common digital currency platform for government departments",
+      "To integrate BHASHINI's multilingual AI technologies into NITI Aayog's digital platforms and services",
+      "To develop a national database exclusively for English-language government documents",
+      "To replace all existing government websites with a single mobile application"
+    ],
+    answer: 1
+  },
+  {
+    q: "Under the collaboration between the Digital India BHASHINI Division (DIBD) and NITI Aayog, several initiatives were highlighted to promote multilingual AI and inclusive governance. Which BHASHINI initiative uses BhashaDaan for the collection, curation and dissemination of linguistic data?",
+    options: [
+      "BHASHINI Mitra",
+      "BHASHINI Pravakta",
+      "BHASHINI Sahayogi",
+      "BHASHINI AppMitra"
+    ],
+    answer: 2
+  },
+  {
+    q: "The inaugural national conclave of Indian Institutes of Handloom Technology (IIHTs), titled IIHT SUTRA 2026, was organised by the Office of the Development Commissioner (Handlooms), Ministry of Textiles. Who inaugurated the conclave, which was held at Dr Ambedkar International Centre, New Delhi?",
+    options: [
+      "Union Minister of Education Dharmendra Pradhan",
+      "Union Minister of Commerce and Industry Piyush Goyal",
+      "Union Minister of MSME Jitan Ram Manjhi",
+      "Union Minister of Textiles Giriraj Singh"
+    ],
+    answer: 3
+  },
+  {
+    q: "IIHT SUTRA 2026 was organised to reposition Indian Institutes of Handloom Technology (IIHTs) as centres of excellence for technical education, research, innovation, entrepreneurship and industry collaboration. Which of the following organisations was associated with the conclave for research, testing, innovation, technical support and capacity building?",
+    options: [
+      "Northern India Textile Research Association (NITRA)",
+      "Indian Institute of Management (IIM) Sambalpur",
+      "Grasim Industries",
+      "Bureau of Indian Standards (BIS)"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Pharmacopoeia Commission for Indian Medicine and Homoeopathy (PCIM&H) and the Indian Pharmacopoeia Commission (IPC) renewed their Memorandum of Understanding (MoU) for the 'One Herb, One Standard' initiative. The renewed agreement aims to develop uniform and scientifically robust quality standards for single drugs of plant origin used in Ayurveda, Siddha, Sowa-Rigpa, Unani and Homoeopathy. For how many additional years was the MoU renewed?",
+    options: [
+      "Two years",
+      "Three years",
+      "Four years",
+      "Five years"
+    ],
+    answer: 1
+  },
+  {
+    q: "The 'One Herb, One Standard' initiative was originally initiated in 2022 by the Pharmacopoeia Commission for Indian Medicine and Homoeopathy (PCIM&H) and the Indian Pharmacopoeia Commission (IPC). How many medicinal-plant monographs had been successfully developed under Phase I of the initiative?",
+    options: [
+      "40",
+      "45",
+      "50",
+      "60"
+    ],
+    answer: 2
+  },
+  {
+    q: "President Droupadi Murmu gave assent to the Prevention of Insults to National Honour (Amendment) Bill, 2026, which amended Section 3 of the Prevention of Insults to National Honour Act, 1971. What key provision was introduced by this amendment regarding the national song 'Vande Mataram'?",
+    options: [
+      "It made the singing of Vande Mataram compulsory in all private institutions",
+      "It declared Vande Mataram as India's national anthem",
+      "It transferred responsibility for the national song to the Ministry of Culture",
+      "It criminalised intentional disruption or prevention of the singing of Vande Mataram"
+    ],
+    answer: 3
+  },
+
+{
+    q: "India Optel Limited (IOL), a Mini Ratna Category-I Defence Public Sector Undertaking (PSU), launched the indigenous ‘GARUD’ High-Resolution Binoculars for civilian applications. Which of the following correctly describes the technical specifications of these binoculars?",
+    options: [
+      "8× magnification, 7.6° field of view, ±5 diopter adjustment and approximately 610 g weight",
+      "10× magnification, 7.6° field of view, ±5 diopter adjustment and approximately 610 g weight",
+      "8× magnification, 6.5° field of view, ±4 diopter adjustment and approximately 650 g weight",
+      "8× magnification, 7.6° field of view, ±6 diopter adjustment and approximately 710 g weight"
+    ],
+    answer: 0
+  },
+  {
+    q: "The ‘GARUD’ High-Resolution Binoculars were developed and manufactured by an optical manufacturing unit of India Optel Limited (IOL). Which unit was responsible for their development and manufacturing?",
+    options: [
+      "Ordnance Factory, Kanpur",
+      "Ordnance Factory, Dehradun",
+      "Ordnance Factory, Tiruchirappalli",
+      "Ordnance Factory, Medak"
+    ],
+    answer: 1
+  },
+  {
+    q: "Researchers from the Indian Institute of Technology Guwahati (IIT Guwahati) developed a two-stage microalgal cultivation process to improve carbon dioxide (CO₂) capture, biomass production and bioenergy generation. What CO₂ concentration was used during the first stage for rapid microalgal growth?",
+    options: [
+      "5%",
+      "10%",
+      "15%",
+      "20%"
+    ],
+    answer: 2
+  },
+  {
+    q: "In the second stage of the two-stage microalgal cultivation process developed by IIT Guwahati, the researchers reduced the CO₂ concentration and added calcium and phosphorus. What was the CO₂ concentration maintained during this stage?",
+    options: [
+      "2%",
+      "5%",
+      "10%",
+      "15%"
+    ],
+    answer: 1
+  },
+  {
+    q: "The two-stage microalgal cultivation process developed by IIT Guwahati demonstrated improvements in biomass production, CO₂ fixation, lipid productivity and intracellular bioenergy efficiency. Which of the following correctly represents the reported results?",
+    options: [
+      "25.7% higher biomass, 35.4% higher CO₂ fixation, 1.68× lipid productivity and 37.65% higher bioenergy efficiency",
+      "35.4% higher biomass, 25.7% higher CO₂ fixation, 1.86× lipid productivity and 37.65% higher bioenergy efficiency",
+      "25.7% higher biomass, 37.65% higher CO₂ fixation, 1.86× lipid productivity and 35.4% higher bioenergy efficiency",
+      "25.7% higher biomass, 35.4% higher CO₂ fixation, 1.86× lipid productivity and 37.65% higher bioenergy efficiency"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Indian Air Force (IAF) and Royal Malaysian Air Force (RMAF) conducted the bilateral air exercise Udara Shakti 2026 to enhance interoperability and operational coordination. Where was the 2026 edition of this exercise conducted?",
+    options: [
+      "Kuantan Air Base, Malaysia",
+      "Subang Air Base, Malaysia",
+      "Butterworth Air Base, Malaysia",
+      "Gong Kedak Air Base, Malaysia"
+    ],
+    answer: 1
+  },
+  {
+    q: "During Exercise Udara Shakti 2026, the Indian Air Force (IAF) deployed four Rafale fighter aircraft and two C-17 strategic transport aircraft. These aircraft belonged to which respective IAF squadrons?",
+    options: [
+      "101 Squadron and 81 Squadron",
+      "81 Squadron and 101 Squadron",
+      "17 Squadron and 81 Squadron",
+      "101 Squadron and 17 Squadron"
+    ],
+    answer: 0
+  },
+  {
+    q: "The first edition of the bilateral air exercise Udara Shakti between the Indian Air Force (IAF) and Royal Malaysian Air Force (RMAF) was conducted in August 2022. Identify the correct dates and location of the inaugural edition.",
+    options: [
+      "10–13 August 2022 at Subang Air Base, Malaysia",
+      "15–18 August 2022 at Butterworth Air Base, Malaysia",
+      "13–16 August 2022 at RMAF Air Base, Kuantan, Malaysia",
+      "13–16 September 2022 at RMAF Air Base, Kuantan, Malaysia"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Central Zoo Authority (CZA) approved the development of Asia’s first desert-themed drive-through night safari, featuring a day zoo, five night safari enclosures and several biodiversity-related facilities. Where will this zoological park and night safari be established?",
+    options: [
+      "Patan, Gujarat",
+      "Deesa, Banaskantha district, Gujarat",
+      "Kutch, Gujarat",
+      "Junagadh, Gujarat"
+    ],
+    answer: 1
+  },
+  {
+    q: "The proposed Desert Zoological Park and Night Safari at Deesa, Gujarat, is planned over government land and will include around 2,700 native and exotic animals and birds representing nearly 83 species. What is its estimated project cost and total area, respectively?",
+    options: [
+      "₹524.14 crore and 130 hectares",
+      "₹542.14 crore and 103 hectares",
+      "₹524.14 crore and 103 hectares",
+      "₹542.14 crore and 130 hectares"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Central Zoo Authority (CZA), which approved the desert-themed zoological park and night safari in Gujarat, is a statutory body responsible for regulating zoos in India. Under which Act was it established in 1992?",
+    options: [
+      "Environment (Protection) Act, 1986",
+      "Biological Diversity Act, 2002",
+      "Wildlife (Protection) Act, 1972",
+      "Forest (Conservation) Act, 1980"
+    ],
+    answer: 2
+  },
+  {
+    q: "Cochin Shipyard Limited (CSL) delivered ‘MS Maria’, the second vessel in the eight-vessel HS EcoFreighter series of Multi-Purpose Vessels (MPVs), to a German company. Who was the recipient of this vessel?",
+    options: [
+      "HS Schiffahrts UG, Germany",
+      "Groot Ship Design, Netherlands",
+      "Det Norske Veritas, Norway",
+      "Hapag-Lloyd AG, Germany"
+    ],
+    answer: 0
+  },
+  {
+    q: "The second HS EcoFreighter series vessel, ‘MS Maria’, delivered by Cochin Shipyard Limited (CSL), is a multi-purpose vessel designed to carry heavy cargo, containers, timber and dry bulk cargo. What is its carrying capacity in Deadweight Tonnage (DWT)?",
+    options: [
+      "6,000 DWT",
+      "8,000 DWT",
+      "7,500 DWT",
+      "7,000 DWT"
+    ],
+    answer: 3
+  },
+  {
+    q: "India and the Southern African Customs Union (SACU) signed the Terms of Reference (ToR) to begin negotiations for a Preferential Trade Agreement (PTA), establishing a formal framework for trade discussions. Where was the ToR signed?",
+    options: [
+      "Bharat Mandapam, New Delhi",
+      "Vanijya Bhawan, New Delhi",
+      "Udyog Bhawan, New Delhi",
+      "Vigyan Bhawan, New Delhi"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Southern African Customs Union (SACU), with which India signed the Terms of Reference (ToR) for Preferential Trade Agreement (PTA) negotiations, is regarded as the world’s oldest existing customs union. Which of the following correctly identifies its establishment year and headquarters?",
+    options: [
+      "Established in 1910; headquartered in Windhoek, Namibia",
+      "Established in 1912; headquartered in Gaborone, Botswana",
+      "Established in 1905; headquartered in Pretoria, South Africa",
+      "Established in 1920; headquartered in Maseru, Lesotho"
+    ],
+    answer: 0
+  },
+  {
+    q: "Parichha Weir, a 140-year-old irrigation structure across the Betwa River in Jhansi, Uttar Pradesh, was selected as a World Heritage Irrigation Structure (WHIS). Which international organisation granted this recognition?",
+    options: [
+      "World Water Council (WWC)",
+      "International Union for Conservation of Nature (IUCN)",
+      "International Commission on Irrigation and Drainage (ICID)",
+      "United Nations Environment Programme (UNEP)"
+    ],
+    answer: 2
+  },
+  {
+    q: "Parichha Weir, recognised as a World Heritage Irrigation Structure (WHIS), plays an important role in supplying irrigation water to the drought-prone Bundelkhand region through the Betwa Canal System. What is the approximate length of the weir and its height above the riverbed?",
+    options: [
+      "1,174 metres and 16.8 metres",
+      "1,147 metres and 18.6 metres",
+      "1,174 metres and 18.6 metres",
+      "1,147 metres and 16.8 metres"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Government of India launched Central Bank Digital Currency (CBDC)-based Direct Benefit Transfer (DBT) under the Pradhan Mantri Garib Kalyan Anna Yojana (PMGKAY), enabling beneficiaries to receive food subsidies through programmable Digital Rupee tokens. Which Union Territories became the first to operationalise this facility for all eligible beneficiaries?",
+    options: [
+      "Puducherry and Chandigarh",
+      "Chandigarh and Dadra & Nagar Haveli",
+      "Dadra & Nagar Haveli and Daman & Diu",
+      "Puducherry and Dadra & Nagar Haveli"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Department of Health Research–Indian Council of Medical Research (DHR-ICMR) concluded the second edition of ICMR-SHINE, or Science & Health Innovation for the Nextgen Explorers, to promote scientific curiosity and health-research awareness. Which group of students was targeted by this initiative?",
+    options: [
+      "Students of Classes 6–8",
+      "Students of Classes 8–10",
+      "Students of Classes 9–12",
+      "Students of Classes 11–12 only"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Gujarat Government approved the establishment of four Centres of Excellence (CoEs) for natural farming with an allocation of ₹20 crore for 2026–27. Which agency will implement this initiative?",
+    options: [
+      "Gujarat Agricultural University",
+      "Gujarat State Seeds Corporation",
+      "Gujarat Natural Farming Mission",
+      "Gujarat Prakrutik Krishi Vikas Board"
+    ],
+    answer: 3
+  },
+
+{
+    q: "The first Black-Necked Crane Festival 2026 was inaugurated in Ladakh by Lieutenant Governor Vinai Kumar Saxena to promote conservation, environmental protection, sustainable livelihoods and eco-tourism. What is the scientific name of the Black-Necked Crane?",
+    options: [
+      "Grus antigone",
+      "Grus nigricollis",
+      "Grus japonensis",
+      "Grus leucogeranus"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Black-Necked Crane is a high-altitude bird whose breeding grounds in India are located in wetlands such as Tsokar and Hanle. At what approximate altitude are these breeding grounds situated in the Changthang Cold Wildlife Sanctuary of Ladakh?",
+    options: [
+      "1,500–2,500 metres",
+      "2,000–4,000 metres",
+      "3,000–5,500 metres",
+      "2,500–5,000 metres"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Karnataka Government approved the phased implementation of SAMASTA, a digital health platform designed to digitise health records across the public health system. Under this initiative, the number of data fields in the ASHA diary was reduced from 485 to how many key data elements?",
+    options: [
+      "134",
+      "145",
+      "154",
+      "124"
+    ],
+    answer: 0
+  },
+  {
+    q: "The SAMASTA digital health platform was piloted in Udupi district of Karnataka to reduce repetitive data entry and improve health-data accessibility. Which of the following correctly represents the reported pilot achievements?",
+    options: [
+      "90% beneficiary registration, 85% health check-ups and 3 lakh ABHA IDs",
+      "95% beneficiary registration, 80% health check-ups and 4 lakh ABHA IDs",
+      "95% beneficiary registration, 85% health check-ups and over 4 lakh ABHA IDs",
+      "85% beneficiary registration, 95% health check-ups and over 4 lakh ABHA IDs"
+    ],
+    answer: 2
+  },
+  {
+    q: "Pakistan, Türkiye and Saudi Arabia signed a trilateral defence pact called the Makkah Joint Defence Agreement, under which an attack on one member would be treated as an attack on all. This provision broadly resembles which article of the North Atlantic Treaty Organization (NATO)?",
+    options: [
+      "Article 3",
+      "Article 4",
+      "Article 6",
+      "Article 5"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Makkah Joint Defence Agreement was signed by the leaders of Pakistan, Türkiye and Saudi Arabia to strengthen trilateral defence and security cooperation. Which of the following correctly identifies the three leaders involved?",
+    options: [
+      "Shehbaz Sharif, Recep Tayyip Erdoğan and Mohammed bin Salman",
+      "Asif Ali Zardari, Recep Tayyip Erdoğan and Mohammed bin Salman",
+      "Shehbaz Sharif, Abdullah II and Mohammed bin Salman",
+      "Shehbaz Sharif, Recep Tayyip Erdoğan and King Salman"
+    ],
+    answer: 0
+  },
+  {
+    q: "Vietnamese aerospace company VinSpace, established in November 2025 with an initial capital of 300 billion Vietnamese dong, signed an agreement with SpaceX to launch its first satellites in 2027. Under which launch service will these satellites be deployed?",
+    options: [
+      "Falcon Heavy dedicated launch mission",
+      "Starship lunar rideshare mission",
+      "SpaceX Transporter rideshare mission",
+      "Dragon cargo resupply mission"
+    ],
+    answer: 2
+  },
+  {
+    q: "NASA invited the Indian Space Research Organisation (ISRO) to join its Moon Base programme during the 9th India-US Civil Space Joint Working Group (CSJWG) meeting. Where was this meeting held?",
+    options: [
+      "NASA Headquarters, Washington, D.C.",
+      "ISRO Headquarters, Bengaluru",
+      "Satish Dhawan Space Centre, Sriharikota",
+      "Vikram Sarabhai Space Centre, Thiruvananthapuram"
+    ],
+    answer: 1
+  },
+  {
+    q: "India joined the Artemis Accords in 2023, becoming the 27th country to sign the framework for cooperation in civil space exploration. According to the given details, how many countries are currently part of the Artemis Accords?",
+    options: [
+      "65",
+      "68",
+      "72",
+      "70"
+    ],
+    answer: 3
+  },
+  {
+    q: "Pakistan’s Space and Upper Atmosphere Research Commission (SUPARCO) named its first lunar rover ‘Jinnah-1’, which is scheduled to be launched in 2029 as part of China’s Chang’e-8 mission. What is the primary destination of this rover?",
+    options: [
+      "Moon’s South Pole",
+      "Moon’s North Pole",
+      "Lunar equatorial region",
+      "Far side of the Moon"
+    ],
+    answer: 0
+  },
+  {
+    q: "Pakistan’s first lunar rover ‘Jinnah-1’ was named after Quaid-e-Azam Muhammad Ali Jinnah. Which young participant proposed the winning name in the naming exercise?",
+    options: [
+      "A 17-year-old participant from Islamabad",
+      "A 16-year-old participant from Lahore",
+      "A 17-year-old participant from Bahawalnagar",
+      "A 18-year-old participant from Karachi"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Government of India launched E-Samudra, a comprehensive digital maritime platform integrating services for seafarers, shipping companies, ports and other maritime stakeholders. Which organisation under the Ministry of Ports, Shipping and Waterways (MoPSW) is responsible for the platform?",
+    options: [
+      "Directorate General of Shipping (DGS)",
+      "Directorate General of Maritime Administration (DGMA)",
+      "Indian Ports Association (IPA)",
+      "Inland Waterways Authority of India (IWAI)"
+    ],
+    answer: 1
+  },
+  {
+    q: "E-Samudra was launched in Mumbai to digitise maritime governance and improve seafarer welfare, security and service delivery. Which of the following is NOT listed among its related initiatives?",
+    options: [
+      "e-NAVIK 24×7 grievance redressal system",
+      "Seafarer Tracking Dashboard",
+      "Digital Seafarers Employment Agreement (d-SEA)",
+      "National Maritime Single Window (NMSW)"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Government extended the PM Electric Drive Revolution in Innovative Vehicle Enhancement (PM E-DRIVE) Scheme to accelerate electric vehicle adoption and strengthen domestic EV manufacturing. Until which date has the scheme been extended?",
+    options: [
+      "31 March 2028",
+      "31 March 2027",
+      "31 December 2027",
+      "30 September 2028"
+    ],
+    answer: 0
+  },
+  {
+    q: "Under the extended PM E-DRIVE Scheme, the incentive for eligible electric two-wheelers (e2Ws) was reduced from ₹5,000 per kWh to ₹2,500 per kWh. What is the maximum incentive per electric two-wheeler under the revised provision?",
+    options: [
+      "₹7,500",
+      "₹10,000",
+      "₹5,000",
+      "₹2,500"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Government e-Marketplace (GeM) celebrated its 10th Foundation Day at Bharat Mandapam, New Delhi, marking a decade of digital public procurement. On which date was GeM originally launched?",
+    options: [
+      "15 August 2016",
+      "9 August 2016",
+      "1 September 2016",
+      "26 January 2017"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Government e-Marketplace (GeM) reported cumulative procurement of over ₹20 lakh crore through more than 3.78 crore orders. What share of cumulative Gross Merchandise Value (GMV) was contributed by Micro and Small Enterprises (MSEs), which fulfilled orders worth over ₹9 lakh crore?",
+    options: [
+      "40.6%",
+      "42.5%",
+      "45.0%",
+      "45.6%"
+    ],
+    answer: 3
+  },
+  {
+    q: "To mark the 10th Foundation Day of the Government e-Marketplace (GeM), the government launched a five-digit Helpdesk short code to improve assistance to platform users. What is the number of this Helpdesk?",
+    options: [
+      "14550",
+      "14450",
+      "15550",
+      "14505"
+    ],
+    answer: 0
+  },
+  {
+    q: "The National Company Law Tribunal (NCLT) launched e-Inspection and e-Certified Copy Services to provide advocates, litigants and other stakeholders with faster access to judicial records. Who inaugurated these digital services?",
+    options: [
+      "NCLT Chairperson Justice Ramalingam Sudhakar",
+      "NCLT President Justice Anupinder Singh Grewal",
+      "NCLAT President Justice Ashok Bhushan",
+      "NCLT President Justice M.M. Kumar"
+    ],
+    answer: 1
+  },
+  {
+    q: "The National Company Law Tribunal (NCLT), which launched e-Inspection and e-Certified Copy Services as part of its digital transformation, is a quasi-judicial body dealing mainly with company law and insolvency matters. Under which legislation was it established, and in which year was it constituted?",
+    options: [
+      "Insolvency and Bankruptcy Code, 2016; constituted in 2017",
+      "Companies Act, 1956; constituted in 2013",
+      "Companies Act, 2013; constituted in 2016",
+      "Limited Liability Partnership Act, 2008; constituted in 2016"
+    ],
+    answer: 2
+  },
+
+{
+    q: "Union Agriculture and Farmers’ Welfare Minister Shivraj Singh Chouhan approved a combined allocation of ₹605.71 crore for Rajasthan and Telangana under the Pradhan Mantri Rashtriya Krishi Vikas Yojana (PM-RKVY) and Krishonnati Yojana (KY). What was the state-wise allocation?",
+    options: [
+      "Rajasthan – ₹340.59 crore; Telangana – ₹265.12 crore",
+      "Rajasthan – ₹350.59 crore; Telangana – ₹255.12 crore",
+      "Rajasthan – ₹340.59 crore; Telangana – ₹275.12 crore",
+      "Rajasthan – ₹330.59 crore; Telangana – ₹275.12 crore"
+    ],
+    answer: 0
+  },
+  {
+    q: "Under the ₹605.71 crore allocation approved for Rajasthan and Telangana under PM-RKVY and Krishonnati Yojana (KY), how much was allocated to Rajasthan specifically under Rashtriya Krishi Vikas Yojana (RKVY) and Krishonnati Yojana (KY), respectively?",
+    options: [
+      "₹216.12 crore and ₹124.47 crore",
+      "₹214.12 crore and ₹126.47 crore",
+      "₹216.12 crore and ₹126.47 crore",
+      "₹218.12 crore and ₹124.47 crore"
+    ],
+    answer: 0
+  },
+  {
+    q: "For the Annual Action Plan 2026–27, Telangana received an approved plan of ₹651.06 crore under the agricultural development programmes. What was the Central Government's share included in this plan?",
+    options: [
+      "₹509.62 crore",
+      "₹390.63 crore",
+      "₹380.63 crore",
+      "₹396.03 crore"
+    ],
+    answer: 1
+  },
+  {
+    q: "Union Home Minister Amit Shah launched the ‘Gramin Gyan Setu’ application to interconnect libraries across his Gandhinagar Lok Sabha constituency in Gujarat. Which occasion was chosen for the launch?",
+    options: [
+      "National Education Day – 11 November",
+      "International Literacy Day – 8 September",
+      "National Library Day – 12 August",
+      "National Reading Day – 19 June"
+    ],
+    answer: 2
+  },
+  {
+    q: "The ‘Gramin Gyan Setu’ application uses a technology-enabled hub-and-spoke model to connect larger libraries with rural libraries and facilitate book circulation through vans. How many larger libraries are connected through this network, and what is their combined book collection?",
+    options: [
+      "5 libraries with 2.50 lakh books",
+      "4 libraries with 2.80 lakh books",
+      "4 libraries with 2.50 lakh books",
+      "6 libraries with 2.80 lakh books"
+    ],
+    answer: 1
+  },
+  {
+    q: "The revamped India Code Portal was launched by Union Minister of State (Independent Charge) for Law and Justice Arjun Ram Meghwal to improve public access to legislation through digital and AI-based features. How many languages listed in the Eighth Schedule of the Indian Constitution are covered by its AI-assisted multilingual access?",
+    options: [
+      "18 languages",
+      "24 languages",
+      "20 languages",
+      "22 languages"
+    ],
+    answer: 3
+  },
+  {
+    q: "The revamped India Code Portal was developed through a collaboration involving government departments and technology initiatives to provide access to Indian legislation, amendments and legislative history. Which combination correctly identifies its developers?",
+    options: [
+      "Legislative Department, National Informatics Centre (NIC) and IndiaAI Mission",
+      "Department of Legal Affairs, NITI Aayog and Digital India Corporation",
+      "Ministry of Electronics and IT, UIDAI and National e-Governance Division",
+      "Legislative Department, Software Technology Parks of India and MeitY"
+    ],
+    answer: 0
+  },
+  {
+    q: "Bengaluru-based space-tech startup Astrobase Space Technologies unveiled ‘EVEREST’, claimed to be India's first privately built 800-kilonewton Full-Flow Staged Combustion (FFSC) liquid oxygen-methane rocket engine. What is its approximate specific impulse?",
+    options: [
+      "300 seconds",
+      "320 seconds",
+      "340 seconds",
+      "360 seconds"
+    ],
+    answer: 2
+  },
+  {
+    q: "Astrobase Space Technologies' ‘EVEREST’ rocket engine uses the Full-Flow Staged Combustion (FFSC) cycle with liquid oxygen (LOX) and methane as propellants. What is the engine's specified throttle range?",
+    options: [
+      "40–100%",
+      "50–110%",
+      "60–120%",
+      "50–100%"
+    ],
+    answer: 1
+  },
+  {
+    q: "The Bengaluru-based startup Astrobase Space Technologies plans to manufacture and test its ‘EVEREST’ rocket engine using facilities in Karnataka and Andhra Pradesh. Which of the following correctly identifies the locations and facilities?",
+    options: [
+      "46,000 sq ft manufacturing facility in Anantapur and 21.5-acre test site in Bengaluru",
+      "45,000 sq ft manufacturing facility in Bengaluru and 21-acre test site in Anantapur",
+      "46,000 sq ft manufacturing facility in Bengaluru and 21.5-acre test site in Anantapur",
+      "46,000 sq ft manufacturing facility in Hyderabad and 21.5-acre test site in Bengaluru"
+    ],
+    answer: 2
+  },
+  {
+    q: "The Agricultural and Processed Food Products Export Development Authority (APEDA) facilitated the first-ever export of 1 metric tonne (MT) of mustard honey from Tripura to Dubai. Which Farmer Producer Organisation (FPO) was involved in this export?",
+    options: [
+      "Dergang Farmer Producer Organisation",
+      "Tripura Organic Farmers Producer Company",
+      "Dhalai Honey Producers Federation",
+      "North East Honey Producers Association"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Agricultural and Processed Food Products Export Development Authority (APEDA) facilitated the first-ever commercial sea shipment of GI-tagged Mithila Makhana from Bihar to Australia. What was the quantity of this shipment?",
+    options: [
+      "15 MT",
+      "18 MT",
+      "20 MT",
+      "12 MT"
+    ],
+    answer: 1
+  },
+  {
+    q: "The first-ever commercial sea shipment of Mithila Makhana from Bihar to Australia was sourced from growers in Darbhanga and shipped from an industrial area in Bihar. Which location served as the shipping point?",
+    options: [
+      "BIADA, Bihta",
+      "Darbhanga Industrial Area",
+      "Patna Inland Container Depot",
+      "Muzaffarpur Industrial Area"
+    ],
+    answer: 0
+  },
+  {
+    q: "India's agricultural exports received a boost through the first-ever commercial sea shipment of Mithila Makhana to Australia, facilitated by APEDA. Approximately what percentage of India's total Makhana production is contributed by Bihar?",
+    options: [
+      "75%",
+      "80%",
+      "85%",
+      "90%"
+    ],
+    answer: 2
+  },
+  {
+    q: "Meta launched ‘Muse Glimmer’, a 30-billion-parameter artificial intelligence (AI) model designed to run locally on consumer computers, reducing dependence on cloud-based computing. Under which licence were its model weights released?",
+    options: [
+      "MIT Licence",
+      "Apache 2.0 Licence",
+      "GNU General Public Licence",
+      "Mozilla Public Licence 2.0"
+    ],
+    answer: 1
+  },
+  {
+    q: "Meta's ‘Muse Glimmer’ AI model was developed by Meta Superintelligence Labs and is designed for local execution on consumer computers. After quantisation, it can run under approximately how much memory?",
+    options: [
+      "Under 16 GB",
+      "Under 24 GB",
+      "Under 32 GB",
+      "Under 20 GB"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Government of India realised ₹45,306 crore through disinvestment and asset monetisation in FY2025–26. Which of the following correctly represents the respective contributions from disinvestment and asset monetisation?",
+    options: [
+      "₹16,885.56 crore and ₹28,420.49 crore",
+      "₹18,885.56 crore and ₹26,420.49 crore",
+      "₹16,885.56 crore and ₹26,420.49 crore",
+      "₹18,885.56 crore and ₹28,420.49 crore"
+    ],
+    answer: 0
+  },
+  {
+    q: "V.O. Chidambaranar Port Authority in Thoothukudi became the first Indian port to receive ISO 50001:2018 certification for its Energy Management System. Which organisation awarded this certification?",
+    options: [
+      "Bureau Veritas",
+      "Indian Register Quality Systems (IRQS)",
+      "Bureau of Indian Standards (BIS)",
+      "Quality Council of India (QCI)"
+    ],
+    answer: 1
+  },
+  {
+    q: "V.O. Chidambaranar Port Authority achieved recognition as a Scope-2 Emission-Free Port by Bureau Veritas and reported substantial renewable electricity usage during 2025–26. What percentage of its electricity came from renewable sources?",
+    options: [
+      "89.39%",
+      "91.89%",
+      "93.89%",
+      "95.89%"
+    ],
+    answer: 2
+  },
+  {
+    q: "Airtel Business and ITI Limited entered into a strategic partnership to accelerate enterprise digital transformation, cybersecurity and modernisation of legacy infrastructure. ITI Limited, which is India's first Public Sector Undertaking (PSU) in the telecom equipment sector, was established in which year?",
+    options: [
+      "1952",
+      "1948",
+      "1956",
+      "1962"
+    ],
+    answer: 1
+  },
+
+{
+    q: "Adani Enterprises Limited (AEL) incorporated AACL Global IFSC Limited as a step-down wholly owned subsidiary to operate as a Global Treasury Centre under the International Financial Services Centres Authority (IFSCA) (Finance Company) Regulations, 2021. What is the initial capital of the newly incorporated company?",
+    options: [
+      "₹10 lakh",
+      "₹5 lakh",
+      "₹15 lakh",
+      "₹25 lakh"
+    ],
+    answer: 1
+  },
+  {
+    q: "AACL Global IFSC Limited was incorporated through a subsidiary structure involving Adani Enterprises Limited (AEL) and Adani Airport City Limited (AACL). Which entity holds 100% equity in AACL Global IFSC Limited?",
+    options: [
+      "Adani Enterprises Limited",
+      "Adani Ports and Special Economic Zone Limited",
+      "Adani Airport City Limited",
+      "Adani Green Energy Limited"
+    ],
+    answer: 2
+  },
+  {
+    q: "IBM partnered with Manipal Institute of Technology (MIT) Bengaluru and CHRIST University to expand artificial intelligence (AI) research, computing and skilling. What is the name of the AI laboratory inaugurated at MIT Bengaluru under this collaboration?",
+    options: [
+      "IBM–MIT AI Lab – MAHE Intelligence GPU (MIG)",
+      "IBM–CHRIST AI Research Centre – Intelligent Computing Grid",
+      "IBM–MIT Centre for Generative Intelligence (CGI)",
+      "IBM–MAHE AI Innovation Hub – Watson GPU"
+    ],
+    answer: 0
+  },
+  {
+    q: "The IBM–MIT AI Lab – MAHE Intelligence GPU (MIG), inaugurated at Manipal Institute of Technology (MIT) Bengaluru, includes a High-Performance Computing (HPC) facility designed to support how many simultaneous workloads?",
+    options: [
+      "20",
+      "25",
+      "40",
+      "30"
+    ],
+    answer: 3
+  },
+  {
+    q: "Hyderabad-based private space-launch company Skyroot Aerospace signed a multi-launch agreement with Kerala-based HEX20 for three dedicated Vikram-series missions. When is the first mission scheduled to take place?",
+    options: [
+      "Q2 2027",
+      "Q4 2027",
+      "Q1 2028",
+      "Q4 2028"
+    ],
+    answer: 1
+  },
+  {
+    q: "Skyroot Aerospace signed a multi-launch agreement with HEX20 for three dedicated missions using its Vikram-series launch vehicles. Which launch vehicle is specifically designed to place satellites into Low Earth Orbit (LEO)?",
+    options: [
+      "Vikram-S",
+      "Vikram-2",
+      "Vikram-1",
+      "Vikram-3"
+    ],
+    answer: 2
+  },
+  {
+    q: "Coal India Limited (CIL) and ArcelorMittal Nippon Steel India (AMNS) signed a Memorandum of Understanding (MoU) to explore coal gasification with Carbon Capture, Utilisation and Storage (CCUS) technology. The proposed plant is planned at or near which AMNS facility?",
+    options: [
+      "Paradip Pellet Plant, Odisha",
+      "Hazira Steel Plant, Gujarat",
+      "Angul Steel Plant, Odisha",
+      "Kalinganagar Steel Plant, Odisha"
+    ],
+    answer: 0
+  },
+  {
+    q: "The Government of India has set a target to gasify 100 million tonnes (MT) of coal by 2030. What is the total outlay of the Cabinet-approved coal and lignite gasification scheme?",
+    options: [
+      "₹35,000 crore",
+      "₹40,000 crore",
+      "₹30,500 crore",
+      "₹37,500 crore"
+    ],
+    answer: 3
+  },
+  {
+    q: "The Indian Institute of Science (IISc) Bengaluru's SPIRE Lab, in collaboration with ARTPARK and with support from Google, launched SraVaani, a multilingual Indian speech-recognition model. How many Indian languages and dialects does the model cover?",
+    options: [
+      "55",
+      "65",
+      "75",
+      "85"
+    ],
+    answer: 1
+  },
+  {
+    q: "The SraVaani multilingual speech-recognition model was developed using the Vaani dataset under Project Vaani, along with other speech datasets. Which of the following correctly describes its language coverage?",
+    options: [
+      "22 scheduled languages and 43 regional languages/dialects",
+      "18 scheduled languages and 47 regional languages/dialects",
+      "20 scheduled languages and 45 regional languages/dialects",
+      "22 scheduled languages and 45 regional languages/dialects"
+    ],
+    answer: 2
+  },
+  {
+    q: "SraVaani, the multilingual Indian speech-recognition model launched by IISc and ARTPARK, was built using a large audio-image dataset and evaluated on multiple benchmark datasets. How many audio-image pairs were used in its training dataset?",
+    options: [
+      "11.8 million",
+      "10.8 million",
+      "12.5 million",
+      "15.8 million"
+    ],
+    answer: 0
+  },
+  {
+    q: "Union Home Minister and Minister of Cooperation Amit Shah inaugurated the new premises of the National Urban Cooperative Finance and Development Corporation (NUCFDC) and launched technology and cybersecurity initiatives for Urban Cooperative Banks (UCBs). Which initiative integrates core banking, digital payments, cloud services and regulatory compliance?",
+    options: [
+      "UCB Digital Shield",
+      "Bank in a Box",
+      "Cooperative Banking Grid",
+      "Urban Bank Connect"
+    ],
+    answer: 1
+  },
+  {
+    q: "The National Urban Cooperative Finance and Development Corporation (NUCFDC) launched a Security Operations Centre (SOC) for Urban Cooperative Banks (UCBs) and signed a Memorandum of Understanding (MoU) with an institution for cybersecurity and digital forensics. Which institution is its MoU partner?",
+    options: [
+      "National Forensic Sciences University (NFSU)",
+      "Indian Institute of Banking and Finance (IIBF)",
+      "National Institute of Securities Markets (NISM)",
+      "Indian Cyber Crime Coordination Centre (I4C)"
+    ],
+    answer: 0
+  },
+  {
+    q: "The National Urban Cooperative Finance and Development Corporation (NUCFDC) announced that its headquarters would shift from Delhi to Maharashtra. According to the given details, how many Urban Cooperative Banks (UCBs) does Maharashtra have, making it the state with the highest number in India?",
+    options: [
+      "429",
+      "459",
+      "449",
+      "439"
+    ],
+    answer: 2
+  },
+  {
+    q: "EazyDiner and IndusInd Bank launched the EazyDiner IndusInd Bank Platinum RuPay Credit Card, offering benefits on dining, entertainment and Unified Payments Interface (UPI) transactions. What is the maximum annual savings benefit advertised for this card?",
+    options: [
+      "₹19,495",
+      "₹21,495",
+      "₹22,495",
+      "₹20,495"
+    ],
+    answer: 1
+  },
+  {
+    q: "The EazyDiner IndusInd Bank Platinum RuPay Credit Card offers dining discounts and entertainment benefits. Which of the following correctly describes its monthly movie-ticket benefit through BookMyShow?",
+    options: [
+      "One Buy-1-Get-1 movie ticket per month",
+      "Two Buy-1-Get-1 movie tickets per month",
+      "One free movie ticket every quarter",
+      "One Buy-1-Get-1 movie ticket every three months"
+    ],
+    answer: 0
+  },
+  {
+    q: "Girija Subramanian joined the Insurance Regulatory and Development Authority of India (IRDAI) as a Whole-Time Member (Distribution) for a five-year term. Whose retirement resulted in the vacancy of this position?",
+    options: [
+      "Rajay Kumar Sinha",
+      "Deepak Sood",
+      "Swaminathan S. Iyer",
+      "Satyajit Tripathy"
+    ],
+    answer: 3
+  },
+  {
+    q: "Before joining the Insurance Regulatory and Development Authority of India (IRDAI) as Whole-Time Member (Distribution), Girija Subramanian held a senior position in an agricultural insurance organisation. What was her previous position?",
+    options: [
+      "Chairperson, Agricultural Insurance Company of India",
+      "Managing Director, General Insurance Corporation of India",
+      "Chairperson, National Agriculture Insurance Company of India",
+      "Director General, Insurance Institute of India"
+    ],
+    answer: 2
+  },
+  {
+    q: "PMS Bazaar partnered with NSDL Database Management Limited (NDML) to facilitate Securities and Exchange Board of India (SEBI) Accredited Investor certification. Which organisation acts as the Accreditation Agency and issues the certificate after verification?",
+    options: [
+      "PMS Bazaar",
+      "NSDL Database Management Limited (NDML)",
+      "Securities and Exchange Board of India (SEBI)",
+      "National Securities Depository Limited (NSDL)"
+    ],
+    answer: 1
+  },
+  {
+    q: "SBI Mutual Fund launched its second Specialised Investment Fund (SIF) strategy, the Magnum Equity Ex-Top 100 Long Short Fund, focusing mainly on stocks outside the top 100 companies by market capitalisation. Who is the fund manager, and which index is its benchmark?",
+    options: [
+      "Gaurav Mehta – Nifty 500 TRI",
+      "Gaurav Mehta – Nifty 100 TRI",
+      "Ramesh Damani – Nifty 500 TRI",
+      "Sankaran Naren – Nifty Midcap 150 TRI"
+    ],
+    answer: 0
+  },
+
+{
+    q: "IIFL Capital Services Ltd partnered with which AI technology company to deploy Agentic AI for investor engagement, analyse investor behaviour, identify investment opportunities and provide personalised investment recommendations to support Assets Under Management (AUM) growth?",
+    options: ["Flytxt", "Fractal Analytics", "NielsenIQ", "LatentView Analytics"],
+    answer: 0
+  },
+  {
+    q: "Flytxt, the AI technology company partnering with IIFL Capital Services for Agentic AI deployment, has how much experience in AI innovation and serves how many enterprises across how many countries?",
+    options: ["10+ years; 80+ enterprises across 40 countries", "15+ years; 80+ enterprises across 50 countries", "15+ years; 100+ enterprises across 50 countries", "20+ years; 80+ enterprises across 60 countries"],
+    answer: 1
+  },
+  {
+    q: "Who has been appointed as the Managing Director (MD) and Chief Executive Officer (CEO) of Manappuram Finance, effective 1 January 2027?",
+    options: ["V. P. Nandakumar", "Sanjay Agarwal", "Ashish Singh", "Siddhartha Mohanty"],
+    answer: 2
+  },
+  {
+    q: "Ashish Singh will succeed whom as the MD and CEO of Manappuram Finance, while the outgoing executive will assume the position of Non-Executive Chairman?",
+    options: ["V. P. Nandakumar", "Ashish Singh", "Sanjay Agarwal", "Ramesh Iyer"],
+    answer: 0
+  },
+  {
+    q: "The appointment of Ashish Singh as MD and CEO of Manappuram Finance follows a proposed investment by Bain Capital. What are the investment amount and proposed stake involved?",
+    options: ["₹4,385 crore for a 15% stake", "₹4,835 crore for an 18% stake", "₹4,385 crore for a 20% stake", "₹4,385 crore for an 18% stake"],
+    answer: 3
+  },
+  {
+    q: "Bajaj General Insurance launched ProShield, a packaged motor insurance solution specifically designed for which category of customers?",
+    options: ["Government employees", "Defence personnel", "Senior citizens", "Commercial vehicle operators"],
+    answer: 1
+  },
+  {
+    q: "Which of the following is NOT one of the three key protection features offered under Bajaj General Insurance's ProShield motor insurance solution for defence personnel?",
+    options: ["Vehicle Relocation Protection", "Travel Emergency Protection", "Document Loss Protection", "International Medical Evacuation Protection"],
+    answer: 3
+  },
+  {
+    q: "Bajaj General Insurance's V Pay and V Pay 2.0 solutions provide protection against emerging risks, including which of the following?",
+    options: ["Cyber incidents involving connected vehicles and covered cyber-related theft of funds", "Only physical damage to vehicles during natural disasters", "Only unauthorised withdrawals from savings accounts", "Cyber risks limited to online banking transactions"],
+    answer: 0
+  },
+  {
+    q: "Galaxy Health Insurance launched which travel insurance product for Indians travelling abroad, in partnership with Europ Assistance India for overseas assistance?",
+    options: ["Galaxy Global Secure", "Galaxy Fly International", "Galaxy Fly Global Travel Insurance", "Galaxy Overseas Protection"],
+    answer: 2
+  },
+  {
+    q: "Multi Commodity Exchange of India (MCX) and National Institute of Securities Markets (NISM) signed a Memorandum of Understanding (MoU) to establish which initiative?",
+    options: ["Centre for Financial Literacy", "Centre for Commodity Markets", "Centre for Banking Innovation", "Centre for Securities Regulation"],
+    answer: 1
+  },
+  {
+    q: "Under the MCX–NISM partnership, the proposed Centre for Commodity Markets will be housed at which institution, while MCX will contribute market expertise?",
+    options: ["Multi Commodity Exchange of India (MCX)", "Securities and Exchange Board of India (SEBI)", "National Stock Exchange (NSE)", "National Institute of Securities Markets (NISM)"],
+    answer: 3
+  },
+  {
+    q: "The Centre for Commodity Markets established through the MCX–NISM partnership will focus on research, professional training and awareness in which areas?",
+    options: ["Commodity derivatives, hedging, risk management and compliance", "Equity derivatives, mutual funds, insurance and pension management", "Foreign exchange trading, cryptocurrency and digital lending", "Agricultural production, food processing and rural infrastructure"],
+    answer: 0
+  },
+  {
+    q: "UCO Bank launched an IFSC Banking Unit (IBU) at GIFT City in Gujarat. What is the primary purpose of this unit?",
+    options: ["To provide only retail savings accounts to domestic customers", "To offer agricultural loans exclusively to Indian farmers", "To provide international banking services such as trade finance, External Commercial Borrowings (ECBs), foreign-currency loans and treasury services", "To manage only government securities transactions within India"],
+    answer: 2
+  },
+  {
+    q: "UCO Bank's IFSC Banking Unit at GIFT City offers what interest rate on Foreign Currency Non-Resident (FCNR(B)) deposits?",
+    options: ["6.00%", "6.50%", "6.75%", "7.00%"],
+    answer: 1
+  },
+  {
+    q: "UCO Bank, which recently launched an IFSC Banking Unit at GIFT City, was established in which year and has its headquarters in which city?",
+    options: ["1943 – Kolkata, West Bengal", "1945 – Mumbai, Maharashtra", "1942 – New Delhi", "1935 – Chennai, Tamil Nadu"],
+    answer: 0
+  },
+  {
+    q: "The Reserve Bank of India (RBI) deferred the implementation of its revised loan recovery and recovery-agent guidelines. What is the new implementation date, extended from 1 October 2026?",
+    options: ["1 December 2026", "1 February 2027", "1 January 2027", "1 April 2027"],
+    answer: 2
+  },
+  {
+    q: "According to the revised RBI loan recovery guidelines, during which time window may a borrower or guarantor be contacted by recovery agents?",
+    options: ["7:00 AM to 8:00 PM", "8:00 AM to 7:00 PM", "9:00 AM to 6:00 PM", "8:00 AM to 8:00 PM"],
+    answer: 1
+  },
+  {
+    q: "Under the RBI's revised guidelines on lender-financed devices, when can restrictions begin after a payment becomes overdue, and when can full restrictions be imposed?",
+    options: ["Restrictions after 15 days and full restrictions after 30 days", "Restrictions after 30 days and full restrictions after 45 days", "Restrictions after 45 days and full restrictions after 60 days", "Restrictions after 30 days and full restrictions after 60 days"],
+    answer: 3
+  },
+  {
+    q: "Under the RBI's revised recovery guidelines, what compensation is payable for wrongful or delayed restoration of device services, subject to a maximum cap?",
+    options: ["₹250 per hour, capped at the loan amount disbursed", "₹500 per hour, capped at ₹10,000", "₹250 per day, capped at the outstanding loan amount", "₹100 per hour, capped at the original loan amount"],
+    answer: 0
+  },
+  {
+    q: "The Reserve Bank of India (RBI) granted a perpetual Authorised Dealer Category-II (AD-II) licence to Indel Remit, the forex division of Indel Money Ltd. What does this licence permit?",
+    options: ["All categories of foreign exchange transactions without restrictions, similar to AD-I entities", "Only foreign currency exchange for tourism-related purposes", "Specified forex transactions, including permitted trade remittances and non-trade current-account transactions under FEMA", "Only capital-account transactions and overseas investment approvals"],
+    answer: 2
+  },
+  {
+    q: "Under the perpetual AD-II licence granted to Indel Remit, foreign-trade transactions are permitted up to what amount per transaction, excluding gifts and donations?",
+    options: ["₹10 lakh", "₹25 lakh", "₹50 lakh", "₹1 crore"],
+    answer: 1
+  },
+  {
+    q: "Apart from Indel Remit, which of the following entities were also mentioned as having received perpetual Authorised Dealer Category-II (AD-II) licences from the RBI?",
+    options: ["Muthoot FinCorp and Paul Merchants", "Muthoot Finance and Manappuram Finance", "Bajaj Finance and Shriram Finance", "IIFL Finance and Tata Capital"],
+    answer: 0
+  },
+  {
+    q: "Indian physicist Deepak Dhar won the 2026 Dirac Medal for his contributions to which field?",
+    options: ["Quantum computing", "Astrophysics", "Nuclear physics", "Statistical mechanics"],
+    answer: 3
+  },
+  {
+    q: "The 2026 Dirac Medal was awarded to Deepak Dhar by which international scientific institution based in Italy?",
+    options: ["European Organization for Nuclear Research (CERN)", "Abdus Salam International Centre for Theoretical Physics (ICTP)", "International Union of Pure and Applied Physics (IUPAP)", "International Atomic Energy Agency (IAEA)"],
+    answer: 1
+  },
+  {
+    q: "Deepak Dhar shared the 2026 Dirac Medal with which group of scientists?",
+    options: ["Bernard Derrida, Marc Mézard and Haim Sompolinsky", "Ashoke Sen, Roger Penrose and Alain Aspect", "Peter Higgs, François Englert and Robert Brout", "Geoffrey Hinton, Yann LeCun and Yoshua Bengio"],
+    answer: 0
+  },
+  {
+    q: "Deepak Dhar became the second Indian to receive the Dirac Medal after which Indian physicist, who received the honour in 2012?",
+    options: ["C. N. R. Rao", "Abhay Ashtekar", "Ashoke Sen", "E. C. George Sudarshan"],
+    answer: 2
+  },
+  {
+    q: "Which algorithm developed by Deepak Dhar is associated with sandpile models and contributed to his work in statistical mechanics?",
+    options: ["Monte Carlo Algorithm", "Burning Algorithm", "Dijkstra's Algorithm", "Shor's Algorithm"],
+    answer: 1
+  },
+  {
+    q: "The Dirac Medal was instituted in which year, is awarded annually on 8 August and carries prize money of how much?",
+    options: ["1980 – US$10,000", "1985 – US$10,000", "1990 – US$5,000", "1985 – US$5,000"],
+    answer: 3
+  },
+  {
+    q: "Dr Padma Gurmet, Director of the National Institute of Sowa-Rigpa, Leh, received which award for her contribution to preserving, promoting and developing Sowa-Rigpa medicine in Ladakh?",
+    options: ["UT Ladakh State Award 2025", "Padma Shri Award 2025", "National Medical Excellence Award 2025", "Ladakh Cultural Heritage Award 2025"],
+    answer: 0
+  },
+  {
+    q: "Who conferred the UT Ladakh State Award 2025 on Dr Padma Gurmet, and how many individuals were honoured for exceptional contributions during 2022–2025?",
+    options: ["President of India; 25 individuals", "Chief Minister of Ladakh; 40 individuals", "Lieutenant Governor Vinai Kumar Saxena; 36 individuals", "Union Home Minister; 30 individuals"],
+    answer: 2
+  },
+
+{
+    q: "President Droupadi Murmu conferred the Sangeet Natak Akademi Fellowships (Akademi Ratna) and Awards (Akademi Puraskar) for 2024–25 on how many artists at Vigyan Bhawan, New Delhi?",
+    options: ["105 artists", "115 artists", "125 artists", "110 artists"],
+    answer: 1
+  },
+  {
+    q: "Which of the following groups consists entirely of artists selected for the Sangeet Natak Akademi Fellowship (Akademi Ratna) for 2024–25?",
+    options: ["Ramlal Bareth, A. V. Anand, Rita Ganguly, Puru Dadheech, Chittaranjan Jyotishi, Pasumarthi Rattaiah Sarma and Sudharani Raghupathy", "Ramlal Bareth, A. V. Anand, Rita Ganguly, Puru Dadheech, Chittaranjan Jyotishi, Pasumarthi Rattaiah Sarma and Shovana Narayan", "Ramlal Bareth, A. V. Anand, Rita Ganguly, Birju Maharaj, Chittaranjan Jyotishi, Pasumarthi Rattaiah Sarma and Sudharani Raghupathy", "Ramlal Bareth, A. V. Anand, Rita Ganguly, Puru Dadheech, Kelucharan Mohapatra, Pasumarthi Rattaiah Sarma and Sudharani Raghupathy"],
+    answer: 0
+  },
+  {
+    q: "Under the Sangeet Natak Akademi awards scheme, what are the respective cash prizes for the Akademi Fellowship (Akademi Ratna) and the Akademi Award (Akademi Puraskar)?",
+    options: ["₹5 lakh and ₹2 lakh", "₹2 lakh and ₹1 lakh", "₹3 lakh and ₹1 lakh", "₹3 lakh and ₹2 lakh"],
+    answer: 2
+  },
+  {
+    q: "Prime Minister Narendra Modi released the autobiography of former President of India Ram Nath Kovind. What is the title of the book and who is its publisher?",
+    options: ["The Republic at Work: My Journey – HarperCollins India", "Triumph of the Indian Republic: My Life, My Struggles – Rupa Publications India", "My Life in Public Service – Penguin Random House India", "India's Democratic Journey – Rupa Publications India"],
+    answer: 1
+  },
+  {
+    q: "Ram Nath Kovind, whose autobiography 'Triumph of the Indian Republic: My Life, My Struggles' was released by Prime Minister Narendra Modi, served as which President of India during 2017–2022?",
+    options: ["12th President", "13th President", "15th President", "14th President"],
+    answer: 3
+  },
+  {
+    q: "Ram Nath Kovind, former President of India and author of 'Triumph of the Indian Republic: My Life, My Struggles', was born on which date and at which place?",
+    options: ["1 October 1945 – Paraunkh, Kanpur Dehat, Uttar Pradesh", "2 October 1946 – Kanpur city, Uttar Pradesh", "1 November 1945 – Lucknow, Uttar Pradesh", "15 August 1947 – Paraunkh, Kanpur Dehat, Uttar Pradesh"],
+    answer: 0
+  },
+  {
+    q: "The Appointments Committee of the Cabinet (ACC) approved a one-year extension for Rahul Navin as Director of the Enforcement Directorate (ED). The extension is valid up to which date or until further orders?",
+    options: ["14 August 2027", "31 December 2027", "13 August 2027", "1 January 2028"],
+    answer: 2
+  },
+  {
+    q: "Rahul Navin became the full-time Director of the Enforcement Directorate (ED) on 14 August 2024, succeeding which former ED Director?",
+    options: ["Sanjay Kumar Mishra", "Sanjay Malhotra", "Tuhin Kanta Pandey", "S. K. Mishra"],
+    answer: 0
+  },
+  {
+    q: "Rahul Navin, who received a one-year extension as Enforcement Directorate (ED) Director, belongs to which batch and service?",
+    options: ["1992-batch Indian Administrative Service (IAS)", "1993-batch Indian Revenue Service (IRS – Income Tax)", "1994-batch Indian Police Service (IPS)", "1993-batch Indian Foreign Service (IFS)"],
+    answer: 1
+  },
+  {
+    q: "The Enforcement Directorate (ED), which investigates financial crimes under the Prevention of Money Laundering Act (PMLA) and Fugitive Economic Offenders Act (FEOA), functions under which administrative department and ministry?",
+    options: ["Department of Financial Services, Ministry of Finance", "Department of Economic Affairs, Ministry of Finance", "Department of Legal Affairs, Ministry of Law and Justice", "Department of Revenue, Ministry of Finance"],
+    answer: 3
+  },
+  {
+    q: "Who was appointed Secretary of the Department of Higher Education, succeeding Vineet Joshi, according to the given bureaucratic reshuffle?",
+    options: ["Pallavi Jain Govil", "Deepti Gaur Mukerjee", "Archana Varma", "Sushil Kumar Lohani"],
+    answer: 1
+  },
+  {
+    q: "As part of the bureaucratic reshuffle mentioned in the current affairs, who was appointed Chairman of the Inland Waterways Authority of India (IWAI)?",
+    options: ["Sunil Paliwal", "Naresh Pal Gangwar", "V. L. Kantha Rao", "Sushil Kumar Lohani"],
+    answer: 3
+  },
+  {
+    q: "Which of the following correctly matches the officials with their new positions in the bureaucratic reshuffle?",
+    options: ["Pallavi Jain Govil – Corporate Affairs Secretary; Sunil Paliwal – Youth Affairs Secretary; Archana Varma – Secretary, Water Resources", "Pallavi Jain Govil – Youth Affairs Secretary; Sunil Paliwal – Corporate Affairs Secretary; Archana Varma – Chairman, IWAI", "Pallavi Jain Govil – Secretary, Water Resources; Sunil Paliwal – Higher Education Secretary; Archana Varma – Corporate Affairs Secretary", "Pallavi Jain Govil – Chairman, IWAI; Sunil Paliwal – Secretary, Water Resources; Archana Varma – Youth Affairs Secretary"],
+    answer: 0
+  },
+  {
+    q: "Lebanon's Parliament abolished the death penalty and replaced it with life imprisonment with aggravated hard labour. According to the given report, what was the significance of this decision?",
+    options: ["Lebanon became the first country in Europe to abolish capital punishment", "Lebanon became the first country in the Arab world/Middle East to formally abolish capital punishment", "Lebanon became the first country in Asia to abolish all forms of life imprisonment", "Lebanon became the first country in the Middle East to abolish military courts"],
+    answer: 1
+  },
+  {
+    q: "Before the Lebanese Parliament formally abolished the death penalty, the country had maintained a de facto moratorium on executions since which year?",
+    options: ["1998", "2001", "2004", "2010"],
+    answer: 2
+  },
+  {
+    q: "The bill to abolish the death penalty in Lebanon was proposed by which Member of Parliament (MP) and was first submitted in which month and year?",
+    options: ["Abdul Rahman al-Bizri – October 2025", "Tamás Sulyok – December 2025", "Abdul Rahman al-Bizri – January 2026", "András Baka – October 2025"],
+    answer: 0
+  },
+  {
+    q: "Hungary's Parliament elected former Supreme Court Chief András Baka as President in a secret ballot. How many votes did he receive as the sole candidate?",
+    options: ["128 votes", "135 votes", "145 votes", "140 votes"],
+    answer: 3
+  },
+  {
+    q: "András Baka, elected President of Hungary, succeeded whom, and what is the tenure of the Hungarian President as elected by Parliament?",
+    options: ["János Áder – 4 years", "Tamás Sulyok – 5 years", "Viktor Orbán – 5 years", "Tamás Sulyok – 6 years"],
+    answer: 1
+  },
+  {
+    q: "András Baka, the newly elected President of Hungary, served as a Judge of the European Court of Human Rights (ECHR) during which period?",
+    options: ["1991–2008", "1995–2010", "2000–2011", "1990–2005"],
+    answer: 0
+  },
+  {
+    q: "Dr Bhooma VG (IRPS Retd.) was selected as Vice-Chancellor of which institution located at Reduit (Minissy), Moka, Mauritius?",
+    options: ["Civil Service College of India", "Atal Bihari Vajpayee Institute of Public Service and Innovation (AIPSI)", "National Institute of Public Administration (NIPA)", "Indian Institute of Public Administration (IIPA)"],
+    answer: 1
+  },
+  {
+    q: "The Atal Bihari Vajpayee Institute of Public Service and Innovation (AIPSI), formerly known as the Civil Service College of Mauritius, was jointly inaugurated in March 2025 by which two Prime Ministers?",
+    options: ["Narendra Modi and Pravind Jugnauth", "Narendra Modi and Navinchandra Ramgoolam", "Amit Shah and Navinchandra Ramgoolam", "Droupadi Murmu and Narendra Modi"],
+    answer: 1
+  },
+  {
+    q: "MP Parameswaran, who passed away at the age of 91 in Thrissur, Kerala, had worked as a scientist at which institution in Mumbai during 1957–1975?",
+    options: ["Indian Space Research Organisation (ISRO)", "Council of Scientific and Industrial Research (CSIR)", "Bhabha Atomic Research Centre (BARC)", "Tata Institute of Fundamental Research (TIFR)"],
+    answer: 2
+  },
+  {
+    q: "MP Parameswaran was instrumental in establishing which organisation and also served it as Secretary and President?",
+    options: ["All India People's Science Network (AIPSN)", "National Innovation Foundation (NIF)", "Indian National Science Academy (INSA)", "Kerala State Council for Science, Technology and Environment (KSCSTE)"],
+    answer: 0
+  },
+  {
+    q: "Which of the following books was written by MP Parameswaran, the former nuclear scientist and communist theorist who received the Kerala Sree Award in 2022?",
+    options: ["The Discovery of India and India Wins Freedom", "Fourth World and Janakeeya Sasthra Prasthanam", "Wings of Fire and Ignited Minds", "The Argumentative Indian and An Uncertain Glory"],
+    answer: 1
+  },
+  {
+    q: "Don Nelson, the legendary National Basketball Association (NBA) coach who passed away at the age of 86, recorded how many career coaching wins and won the NBA Coach of the Year award how many times?",
+    options: ["1,250 wins and 2 times", "1,335 wins and 3 times", "1,400 wins and 4 times", "1,335 wins and 2 times"],
+    answer: 1
+  },
+  {
+    q: "Former Chinese Premier Zhu Rongji, who passed away at the age of 97 in Beijing, served as Premier of China during which period under President Jiang Zemin?",
+    options: ["1995–2000", "1997–2002", "1998–2003", "2000–2005"],
+    answer: 2
+  },
+  {
+    q: "Zhu Rongji played a key role in China's transition towards a market-based economy and its entry into the World Trade Organization (WTO). On which date did China join the WTO?",
+    options: ["11 December 2001", "1 January 2002", "15 August 2001", "11 November 2000"],
+    answer: 0
+  },
+  {
+    q: "Former Chinese Premier Zhu Rongji, who studied at Tsinghua University and served under President Jiang Zemin, was born on which date and in which province of China?",
+    options: ["23 October 1928 – Hunan", "1 October 1928 – Beijing", "23 September 1930 – Shanghai", "10 December 1927 – Guangdong"],
+    answer: 0
+  },
+
+];
+
+
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let userAnswers = new Array(questions.length).fill(null);
+
+let markedForReview = new Array(questions.length).fill(false);
+
+let submitted = false;
+
+// ===============================
+// LOAD QUIZ
+// ===============================
+
+function loadQuiz(){
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((question,index)=>{
+
+        const qDiv = document.createElement("div");
+
+        qDiv.classList.add("question");
+
+        qDiv.id = `question_${index}`;
+
+        qDiv.innerHTML = `
+        <h3>Q${index+1}. ${question.q}</h3>
+        `;
+
+        question.options.forEach((option,optIndex)=>{
+
+            const opt = document.createElement("div");
+
+            opt.classList.add("option");
+
+            opt.innerText = option;
+
+            opt.onclick = ()=>selectOption(index,optIndex,opt);
+
+            opt.id = `q${index}_opt${optIndex}`;
+
+            qDiv.appendChild(opt);
+
+        });
+
+        // MARK BUTTON
+
+        const markBtn = document.createElement("button");
+
+        markBtn.innerText = "Mark For Review";
+
+        markBtn.classList.add("mark-btn");
+
+        markBtn.onclick = ()=>toggleMark(index,markBtn);
+
+        qDiv.appendChild(markBtn);
+
+        // CLEAR BUTTON
+
+        const clearBtn = document.createElement("button");
+
+        clearBtn.innerText = "Clear";
+
+        clearBtn.classList.add("clear-btn");
+
+        clearBtn.onclick = ()=>clearAnswer(index);
+
+        qDiv.appendChild(clearBtn);
+
+        quizDiv.appendChild(qDiv);
+
+    });
+
+}
+
+// ===============================
+// SELECT OPTION
+// ===============================
+
+function selectOption(qIndex,optIndex,element){
+
+    if(submitted) return;
+
+    userAnswers[qIndex] = optIndex;
+
+    const options = document.querySelectorAll(`[id^="q${qIndex}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+
+}
+
+// ===============================
+// MARK FOR REVIEW
+// ===============================
+
+function toggleMark(index,button){
+
+    markedForReview[index] = !markedForReview[index];
+
+    const questionBox = document.getElementById(`question_${index}`);
+
+    if(markedForReview[index]){
+
+        button.classList.add("marked");
+
+        button.innerText = "Marked For Review";
+
+        questionBox.classList.add("review-marked");
+
+    }else{
+
+        button.classList.remove("marked");
+
+        button.innerText = "Mark For Review";
+
+        questionBox.classList.remove("review-marked");
+
+    }
+
+}
+
+// ===============================
+// CLEAR ANSWER
+// ===============================
+
+function clearAnswer(index){
+
+    if(submitted) return;
+
+    userAnswers[index] = null;
+
+    const options = document.querySelectorAll(`[id^="q${index}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+}
+
+// ===============================
+// SUBMIT QUIZ
+// ===============================
+
+function submitQuiz(){
+
+    if(submitted) return;
+
+    submitted = true;
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        if(userAns === null){
+
+            unansweredCount++;
+
+        }
+        else if(userAns === question.answer){
+
+            score += 1;
+            correctCount++;
+
+        }
+        else{
+
+            score -= 0.25;
+            wrongCount++;
+
+        }
+
+    });
+
+    let attempted = correctCount + wrongCount;
+
+    let accuracy = attempted > 0
+    ? ((correctCount/attempted)*100).toFixed(2)
+    : 0;
+
+    document.body.innerHTML = `
+
+    <div class="container">
+
+        <div class="result-box">
+
+            <h1>Quiz Submitted ✅</h1>
+
+            <h2>Total Score: ${score.toFixed(2)}</h2>
+
+            <h3>Correct Answers: ${correctCount}</h3>
+
+            <h3>Wrong Answers: ${wrongCount}</h3>
+
+            <h3>Unanswered Questions: ${unansweredCount}</h3>
+
+            <h3>Accuracy: ${accuracy}%</h3>
+
+            <button class="review-btn" onclick="reviewAnswers()">
+            Review Answers
+            </button>
+
+            <div id="reviewSection"></div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+// ===============================
+// REVIEW ANSWERS
+// ===============================
+
+function reviewAnswers(){
+
+    const reviewSection = document.getElementById("reviewSection");
+
+    let html = `<h1 style="margin-top:40px;">Review Section</h1>`;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        let status = "";
+        let marks = "";
+
+        if(userAns === null){
+
+            status = `<span class="unanswered">Unanswered</span>`;
+            marks = `0 Marks`;
+
+        }
+        else if(userAns === question.answer){
+
+            status = `<span class="correct">Correct ✅</span>`;
+            marks = `+1 Mark`;
+
+        }
+        else{
+
+            status = `<span class="wrong">Wrong ❌</span>`;
+            marks = `-0.25 Mark`;
+
+        }
+
+        html += `
+
+        <div class="review-question">
+
+            <h3>Q${index+1}. ${question.q}</h3>
+
+            <p>${status}</p>
+
+            <p><b>Marks:</b> ${marks}</p>
+
+            <p>
+            <b>Your Answer:</b>
+            ${
+                userAns === null
+                ? "Not Attempted"
+                : question.options[userAns]
+            }
+            </p>
+
+            <div class="correct-answer">
+            <b>Correct Answer:</b>
+            ${question.options[question.answer]}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    reviewSection.innerHTML = html;
+
+}
+
+// ===============================
+// TIMER
+// ===============================
+
+let time = 7200;
+
+let timer;
+
+let isPaused = false;
+
+function startTimer(){
+
+    timer = setInterval(()=>{
+
+        if(!isPaused){
+
+            let minutes = Math.floor(time/60);
+
+            let seconds = time%60;
+
+            document.getElementById("timer").innerText =
+            `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+
+            time--;
+
+            if(time < 0){
+
+                clearInterval(timer);
+
+                alert("Time is up! Quiz auto-submitted.");
+
+                submitQuiz();
+
+            }
+
+        }
+
+    },1000);
+
+}
+
+// ===============================
+// PAUSE TIMER
+// ===============================
+
+function pauseTimer(){
+
+    if(submitted) return;
+
+    isPaused = true;
+
+    document.getElementById("pauseBtn").disabled = true;
+
+    document.getElementById("resumeBtn").disabled = false;
+
+    // Disable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.add("disabled-option");
+    });
+
+    // Disable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = true;
+        btn.classList.add("disabled-btn");
+    });
+
+}
+// ===============================
+// RESUME TIMER
+// ===============================
+
+function resumeTimer(){
+
+    if(submitted) return;
+
+    isPaused = false;
+
+    document.getElementById("pauseBtn").disabled = false;
+
+    document.getElementById("resumeBtn").disabled = true;
+
+    // Enable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.remove("disabled-option");
+    });
+
+    // Enable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = false;
+        btn.classList.remove("disabled-btn");
+    });
+
+}
+// ===============================
+
+loadQuiz();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
